@@ -3,6 +3,7 @@ package org.learn_java;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.api.JDABuilder;
+import org.learn_java.commands.Code;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ public class App {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setOwnerId(config.getOwner());
         builder.setPrefix(config.getPrefix());
+        builder.addCommand(new Code());
         CommandClient client = builder.build();
 
 
