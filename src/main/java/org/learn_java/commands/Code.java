@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Message;
 public class Code extends Command {
 
     private Message message;
-    private EventWaiter waiter;
 
     public Code(){
         this.name = "code";
