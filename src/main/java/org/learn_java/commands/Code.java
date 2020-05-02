@@ -21,7 +21,7 @@ public class Code extends Command {
         builder.append("//your code");
         builder.append("\n\\`\\`\\`");
         builder.append("\n Which will result in a code block such as");
-        builder.appendCodeBlock("int x = 3\nSystem.out.println(x);", "java");
+        builder.appendCodeBlock("int x = 3;\nSystem.out.println(x);", "java");
         return builder.build();
     }
 
