@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 
 public class CodeBlockListener extends ListenerAdapter {
 
-    private static final String THUMBS_UP = "\uD83D\uDC4D";
-    private static final String THUMBS_DOWN = "\uD83D\uDC4E";
-    private static final String DELETE = "❌";
+    private static final String THUMBS_UP = EmojiManager.getForAlias("thumbsup").getUnicode();
+    private static final String THUMBS_DOWN = EmojiManager.getForAlias("thumbsdown").getUnicode();
+    private static final String DELETE = EmojiManager.getForAlias("x").getUnicode();
     private static final String NUMBERS = EmojiManager.getForAlias("1234").getUnicode();
 
     private final List<CodeBlock> codeBlocks = new ArrayList<>();
