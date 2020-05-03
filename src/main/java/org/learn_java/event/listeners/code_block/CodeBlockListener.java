@@ -1,6 +1,5 @@
 package org.learn_java.event.listeners.code_block;
 
-import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -117,7 +116,7 @@ public class CodeBlockListener extends ListenerAdapter {
             CodeBlock codeBlock = new CodeBlock(message, sentMessage, message.getAuthor());
             codeBlocks.add(codeBlock);
             sentMessage.addReaction(THUMBS_UP).queue(then -> sentMessage.addReaction(THUMBS_DOWN).queue(last -> sentMessage.addReaction(DELETE).queue()));
-            sentMessage.clearReactions().queueAfter(5, TimeUnit.MINUTES, (delete) -> codeBlocks.remove(codeBlock));
+            sentMessage.clearReactions().queueAfter(5, TimeUnit.MINUTES, (delete) -> codeBlocks.remove(codeBlock), (error) -> codeBlocks.remove(codeBlock));
         });
     }
 
