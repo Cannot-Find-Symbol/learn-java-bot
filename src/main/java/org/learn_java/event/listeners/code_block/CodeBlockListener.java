@@ -4,6 +4,7 @@ import com.vdurmont.emoji.EmojiManager;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -54,9 +55,8 @@ public class CodeBlockListener extends ListenerAdapter {
         }
 
         CodeBlock block = codeBlocks.get(event.getReaction().getMessageId());
-        String emoji = event.getReaction().getReactionEmote().getEmoji();
         RestAction<Message> foundMessage = event.getChannel().retrieveMessageById(block.getMessageId());
-        if (emoji.equals(THUMBS_UP)) {
+        if (emote.equals(THUMBS_UP)) {
             foundMessage.queue(message -> {
                 if (block.getOriginal().equals(message)) {
                     message.editMessage(block.getReformatted()).queue(block::setReformatted);
@@ -65,7 +65,7 @@ public class CodeBlockListener extends ListenerAdapter {
 
         }
 
-        if (emoji.equals(THUMBS_DOWN)) {
+        if (emote.equals(THUMBS_DOWN)) {
             foundMessage.queue(message -> {
                 if (block.getReformatted().equals(message)) {
                     message.editMessage(block.getOriginal()).queue(block::setOriginal);
@@ -73,7 +73,7 @@ public class CodeBlockListener extends ListenerAdapter {
             });
         }
 
-        if (emoji.equals(DELETE)) {
+        if (emote.equals(DELETE)) {
             foundMessage.queue(message -> {
                 if (block.getOwner().equals(event.getUser())) {
                     message.delete().queue();
@@ -83,6 +83,17 @@ public class CodeBlockListener extends ListenerAdapter {
         }
 
         event.getReaction().removeReaction(event.getUser()).queue();
+    }
+
+    public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+        if(event.getAuthor().isBot()){
+            return;
+        }
+
+        String messageId = event.getMessageId();
+        if(!codeBlocks.containsKey(messageId)){
+            event.getMessage().addReaction(NUMBERS).queue();
+        }
     }
 
 
