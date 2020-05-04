@@ -17,12 +17,17 @@ import java.util.stream.Collectors;
 
 public class CodeBlockListener extends ListenerAdapter {
 
-    private static final String THUMBS_UP = EmojiManager.getForAlias("thumbsup").getUnicode();
+    private static final String THUMBS_UP;
     private static final String THUMBS_DOWN = EmojiManager.getForAlias("thumbsdown").getUnicode();
     private static final String DELETE = EmojiManager.getForAlias("x").getUnicode();
     private static final String NUMBERS = EmojiManager.getForAlias("1234").getUnicode();
 
+    static {
+        THUMBS_UP = EmojiManager.getForAlias("thumbsup").getUnicode();
+    }
+
     private final Map<String, CodeBlock> codeBlocks = new HashMap<>();
+
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         Message message = event.getMessage();
@@ -56,6 +61,8 @@ public class CodeBlockListener extends ListenerAdapter {
 
         CodeBlock block = codeBlocks.get(event.getReaction().getMessageId());
         RestAction<Message> foundMessage = event.getChannel().retrieveMessageById(block.getMessageId());
+
+
         if (emote.equals(THUMBS_UP)) {
             foundMessage.queue(message -> {
                 if (block.getOriginal().equals(message)) {
@@ -63,17 +70,13 @@ public class CodeBlockListener extends ListenerAdapter {
                 }
             });
 
-        }
-
-        if (emote.equals(THUMBS_DOWN)) {
+        } else if (emote.equals(THUMBS_DOWN)) {
             foundMessage.queue(message -> {
                 if (block.getReformatted().equals(message)) {
                     message.editMessage(block.getOriginal()).queue(block::setOriginal);
                 }
             });
-        }
-
-        if (emote.equals(DELETE)) {
+        } else if (emote.equals(DELETE)) {
             foundMessage.queue(message -> {
                 if (block.getOwner().equals(event.getUser())) {
                     message.delete().queue();
@@ -86,12 +89,12 @@ public class CodeBlockListener extends ListenerAdapter {
     }
 
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
-        if(event.getAuthor().isBot()){
+        if (event.getAuthor().isBot()) {
             return;
         }
 
         String messageId = event.getMessageId();
-        if(!codeBlocks.containsKey(messageId)){
+        if (!codeBlocks.containsKey(messageId)) {
             event.getMessage().addReaction(NUMBERS).queue();
         }
     }
