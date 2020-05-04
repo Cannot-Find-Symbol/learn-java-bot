@@ -21,7 +21,7 @@ public class CodeBlockListener extends ListenerAdapter {
     private static final String DELETE = EmojiManager.getForAlias("x").getUnicode();
     private static final String NUMBERS = EmojiManager.getForAlias("1234").getUnicode();
 
-    private final List<CodeBlock> codeBlocks = new ArrayList<>();
+    private final Map<String, CodeBlock> codeBlocks = new HashMap<>();
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         Message message = event.getMessage();
@@ -49,38 +49,40 @@ public class CodeBlockListener extends ListenerAdapter {
             }
         }
 
-        for (CodeBlock block : codeBlocks) {
-            if (block.getMessageId().equals(event.getReaction().getMessageId())) {
-                String emoji = event.getReaction().getReactionEmote().getEmoji();
-                RestAction<Message> channel = event.getChannel().retrieveMessageById(block.getMessageId());
-                if (emoji.equals(THUMBS_UP)) {
-                    channel.queue(message -> {
-                        if (block.getOriginal().equals(message)) {
-                            message.editMessage(block.getReformatted()).queue(block::setReformatted);
-                        }
-                    });
-
-                }
-
-                if (emoji.equals(THUMBS_DOWN)) {
-                    channel.queue(message -> {
-                        if (block.getReformatted().equals(message)) {
-                            message.editMessage(block.getOriginal()).queue(block::setOriginal);
-                        }
-                    });
-                }
-
-                if (emoji.equals(DELETE)) {
-                    channel.queue(message -> {
-                        if (block.getOwner().equals(event.getUser())) {
-                            message.delete().queue();
-                            codeBlocks.remove(block);
-                        }
-                    });
-                }
-                event.getReaction().removeReaction(event.getUser()).queue();
-            }
+        if (!codeBlocks.containsKey(event.getReaction().getMessageId())) {
+            return;
         }
+
+        CodeBlock block = codeBlocks.get(event.getReaction().getMessageId());
+        String emoji = event.getReaction().getReactionEmote().getEmoji();
+        RestAction<Message> foundMessage = event.getChannel().retrieveMessageById(block.getMessageId());
+        if (emoji.equals(THUMBS_UP)) {
+            foundMessage.queue(message -> {
+                if (block.getOriginal().equals(message)) {
+                    message.editMessage(block.getReformatted()).queue(block::setReformatted);
+                }
+            });
+
+        }
+
+        if (emoji.equals(THUMBS_DOWN)) {
+            foundMessage.queue(message -> {
+                if (block.getReformatted().equals(message)) {
+                    message.editMessage(block.getOriginal()).queue(block::setOriginal);
+                }
+            });
+        }
+
+        if (emoji.equals(DELETE)) {
+            foundMessage.queue(message -> {
+                if (block.getOwner().equals(event.getUser())) {
+                    message.delete().queue();
+                    codeBlocks.remove(message.getId());
+                }
+            });
+        }
+
+        event.getReaction().removeReaction(event.getUser()).queue();
     }
 
 
@@ -114,9 +116,9 @@ public class CodeBlockListener extends ListenerAdapter {
         MessageAction newMessage = message.getChannel().sendMessage(reformatted);
         newMessage.queue(sentMessage -> {
             CodeBlock codeBlock = new CodeBlock(message, sentMessage, message.getAuthor());
-            codeBlocks.add(codeBlock);
+            codeBlocks.put(sentMessage.getId(), codeBlock);
             sentMessage.addReaction(THUMBS_UP).queue(then -> sentMessage.addReaction(THUMBS_DOWN).queue(last -> sentMessage.addReaction(DELETE).queue()));
-            sentMessage.clearReactions().queueAfter(5, TimeUnit.MINUTES, (delete) -> codeBlocks.remove(codeBlock), (error) -> codeBlocks.remove(codeBlock));
+            sentMessage.clearReactions().queueAfter(5, TimeUnit.MINUTES, (delete) -> codeBlocks.remove(codeBlock.getMessageId()), (error) -> codeBlocks.remove(codeBlock.getMessageId()));
         });
     }
 
