@@ -13,12 +13,26 @@ public class Format extends Command {
     public Format() {
         this.name = "format";
         this.help = "Formats users non formatted message";
-        this.cooldown = 120;
+        this.cooldown = 20;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        String messageId = event.getArgs();
+
+        if(event.getArgs().isBlank()){
+            event.getChannel().sendMessage("!format needs at least 1 argument").queue();
+            return;
+        }
+
+        String[] args = event.getArgs().trim().split(" ");
+
+        if(args.length > 2) {
+            event.getChannel().sendMessage("Too many arguments for format command, try again").queue();
+            return;
+        }
+
+        String messageId = args[0];
+        String language = args.length < 2 ? "java" : args[1];
 
         if (!StringUtils.isNumeric(messageId)) {
             event.getChannel().sendMessage("message id must be numeric, try again").queue();
@@ -31,8 +45,8 @@ public class Format extends Command {
         }
 
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
-            String wrappedContent = StringUtils.wrap(message.getContentRaw(), "```");
-            message.getChannel().sendMessage(wrappedContent).queue();
+            String wrappedMessage = String.format("```%s\n%s\n```", language, message.getContentRaw());
+            message.getChannel().sendMessage(wrappedMessage).queue();
         }, error -> {
             event.getChannel().sendMessage("Something bad happened, couldn't format").queue();
         });
