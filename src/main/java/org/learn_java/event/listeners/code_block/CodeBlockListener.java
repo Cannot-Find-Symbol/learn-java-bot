@@ -94,7 +94,7 @@ public class CodeBlockListener extends ListenerAdapter {
         }
 
         String messageId = event.getMessageId();
-        if (!codeBlocks.containsKey(messageId)) {
+        if (hasCodeBlock(event.getMessage()) && !codeBlocks.containsKey(messageId)) {
             event.getMessage().addReaction(NUMBERS).queue();
         }
     }
