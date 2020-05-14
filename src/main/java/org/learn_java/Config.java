@@ -1,6 +1,7 @@
 package org.learn_java;
 
 import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.util.sqlite.SQLiteDSL;
 

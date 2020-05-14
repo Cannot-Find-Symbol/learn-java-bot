@@ -129,9 +129,6 @@
                             <name>org.jooq.meta.sqlite.SQLiteDatabase</name>
                             <includes>.*</includes>
                         </database>
-                        <generate>
-                            <daos>true</daos>
-                        </generate>
                         <target>
                             <packageName>org.learn_java.db.autogen</packageName>
                         </target>
