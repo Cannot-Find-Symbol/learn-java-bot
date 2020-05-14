@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import org.learn_java.commands.Code;
 import org.learn_java.commands.Format;
+import org.learn_java.commands.Info;
 import org.learn_java.event.listeners.code_block.CodeBlockListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ public class App {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setOwnerId(config.getOwner());
         builder.setPrefix(config.getPrefix());
-        builder.addCommands(new Code(), new Format());
+        builder.addCommands(new Code(), new Format(), new Info());
         CommandClient client = builder.build();
 
 
