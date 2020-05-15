@@ -91,10 +91,11 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.20</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.6.0</version>
         </dependency>
 
         <dependency>
@@ -139,13 +140,13 @@
                 </executions>
                 <configuration>
                     <jdbc>
-                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <driver>org.mariadb.jdbc.Driver</driver>
                         <!--suppress UnresolvedMavenProperty -->
                         <url>${db.url}</url>
                     </jdbc>
                     <generator>
                         <database>
-                            <name>org.jooq.meta.mysql</name>
+                            <name>org.jooq.meta.mariadb.MariaDBDatabase</name>
                             <includes>.*</includes>
                         </database>
                         <target>
