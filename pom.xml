@@ -9,8 +9,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <encoding>UTF-8</encoding>
     </properties>
 
@@ -171,6 +171,9 @@
                 <configuration>
                     <!--suppress UnresolvedMavenProperty -->
                     <url>${db.url}</url>
+                    <locations>
+          	         <location>filesystem:src/main/resources/db</location>
+                    </locations>
                 </configuration>
             </plugin>
             <plugin>
