@@ -2,7 +2,7 @@ package org.learn_java.data.repositories;
 
 import org.learn_java.data.dto.InfoDTO;
 
-import static org.learn_java.db.autogen.Tables.INFO;
+import static org.learn_java.db.autogen.learnjava.tables.Info.INFO;
 
 import java.util.List;
 
