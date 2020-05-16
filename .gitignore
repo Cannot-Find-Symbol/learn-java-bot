@@ -132,4 +132,6 @@ buildNumber.properties
 #config
 *.properties
 
+#database
+*.sqlite
 # End of https://www.gitignore.io/api/java,maven,intellij

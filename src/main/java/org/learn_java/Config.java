@@ -1,5 +1,10 @@
 package org.learn_java;
 
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.jooq.util.sqlite.SQLiteDSL;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -9,6 +14,7 @@ public class Config {
     private String discordKey;
     private String prefix;
     private String owner;
+    private static DSLContext dslContext;
 
     public Config() {
 
@@ -18,6 +24,7 @@ public class Config {
             discordKey = properties.getProperty("discord.key");
             prefix = properties.getProperty("bot.prefix");
             owner = properties.getProperty("bot.owner.id");
+            dslContext = DSL.using(properties.getProperty("db.url"));
 
         } catch (IOException e) {
             System.out.println("Cannot read settings file");
@@ -35,5 +42,9 @@ public class Config {
 
     public String getOwner() {
         return owner;
+    }
+
+    public static DSLContext getDslContext() {
+        return dslContext;
     }
 }
