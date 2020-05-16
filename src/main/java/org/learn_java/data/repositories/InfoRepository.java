@@ -14,7 +14,10 @@ public class InfoRepository extends SimpleRepository<InfoDTO> {
     }
 
     public int update(InfoDTO item) {
-        return dslContext.update(INFO).set(INFO.MESSAGE, item.getMessage()).where(INFO.TAG_NAME.eq(item.getTagName())).execute();
+        return dslContext.update(INFO)
+                         .set(INFO.MESSAGE, item.getMessage())
+                         .where(INFO.TAG_NAME.eq(item.getTagName()))
+                         .execute();
     }
 
     public int remove(String tagName) {
@@ -27,8 +30,11 @@ public class InfoRepository extends SimpleRepository<InfoDTO> {
 
 
     public InfoDTO findByName(String name) {
-        return dslContext.selectFrom(INFO).where(INFO.TAG_NAME.eq(name)).fetchOptional().map(e -> e.into(InfoDTO.class)).orElse(null);
+        return dslContext.selectFrom(INFO)
+                         .where(INFO.TAG_NAME.eq(name))
+                         .fetchOptional()
+                         .map(e -> e.into(InfoDTO.class))
+                         .orElse(null);
 
     }
-
 }
