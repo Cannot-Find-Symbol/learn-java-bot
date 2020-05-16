@@ -4,8 +4,8 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.learn_java.configuration.Config;
-import org.learn_java.event.listeners.code_block.CodeBlockListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -19,11 +19,13 @@ public class BotRunner implements CommandLineRunner {
     final static Logger logger = LoggerFactory.getLogger(BotRunner.class);
 
     private final Command[] commands;
+    private final ListenerAdapter[] listeners;
     private final Config config;
 
 
-    public BotRunner(Command[] commands, Config config){
+    public BotRunner(Command[] commands, ListenerAdapter[] listeners, Config config){
         this.commands = commands;
+        this.listeners = listeners;
         this.config = config;
     }
 
@@ -36,7 +38,7 @@ public class BotRunner implements CommandLineRunner {
         CommandClient client = builder.build();
 
         try {
-            JDABuilder.createDefault(config.getDiscordKey()).addEventListeners(client, new CodeBlockListener()).build();
+            JDABuilder.createDefault(config.getDiscordKey()).addEventListeners(client).addEventListeners().build();
         } catch (LoginException e) {
             logger.error("Invalid API key, check application.properties");
         }

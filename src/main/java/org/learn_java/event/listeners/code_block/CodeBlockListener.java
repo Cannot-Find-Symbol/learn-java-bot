@@ -28,6 +28,8 @@ public class CodeBlockListener extends ListenerAdapter {
 
     private final Map<String, CodeBlock> codeBlocks = new HashMap<>();
 
+    public CodeBlockListener() {
+    }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         Message message = event.getMessage();
