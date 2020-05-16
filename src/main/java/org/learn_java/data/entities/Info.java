@@ -6,22 +6,22 @@ import javax.persistence.Id;
 @Entity
 public class Info {
 
-  @Id private String tagName;
+  @Id private String topic;
   private String message;
 
   public Info() {}
 
-  public Info(String tagName, String message) {
-    this.tagName = tagName;
+  public Info(String topic, String message) {
+    this.topic = topic;
     this.message = message;
   }
 
-  public String getTagName() {
-    return tagName;
+  public String getTopic() {
+    return topic;
   }
 
-  public void setTagName(String tagName) {
-    this.tagName = tagName;
+  public void setTopic(String tagName) {
+    this.topic = tagName;
   }
 
   public String getMessage() {

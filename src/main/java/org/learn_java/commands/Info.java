@@ -44,10 +44,8 @@ public class Info extends Command {
 
     if (args[0].equals("topics")) {
       List<String> topics =
-          repository
-              .findAll()
-              .stream()
-              .map(org.learn_java.data.entities.Info::getTagName)
+          repository.findAll().stream()
+              .map(org.learn_java.data.entities.Info::getTopic)
               .collect(Collectors.toList());
       EmbedBuilder builder = new EmbedBuilder();
       StringBuilder sb = builder.getDescriptionBuilder();
