@@ -1,3 +1,10 @@
-discord.key=asdfadfasdfafdasdfafadfasf
+#Bot properties
+discord.key=abcdefjijklmnopqrstuvwxyz
 bot.prefix=!
-bot.owner.id=12351235135135515255
+bot.ownerid=123456789
+
+#Spring properties
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+spring.datasource.username=learnjava
+spring.datasource.url=jdbc:mariadb://localhost:3306/learnjava
