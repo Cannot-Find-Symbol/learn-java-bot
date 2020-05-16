@@ -1,7 +1,9 @@
 package org.learn_java.bot.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Config {
 
   @Value("${discord.key}")

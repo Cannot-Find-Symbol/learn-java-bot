@@ -8,7 +8,9 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 import org.learn_java.bot.data.repositories.InfoRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Info extends Command {
   private final InfoRepository repository;
 
