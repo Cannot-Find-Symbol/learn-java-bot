@@ -80,18 +80,10 @@
 
         <dependency>
             <groupId>org.jooq</groupId>
-            <artifactId>jooq-meta</artifactId>
-            <version>3.13.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jooq</groupId>
             <artifactId>jooq-codegen</artifactId>
             <version>3.13.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
@@ -172,7 +164,7 @@
                     <!--suppress UnresolvedMavenProperty -->
                     <url>${db.url}</url>
                     <locations>
-          	         <location>filesystem:src/main/resources/db</location>
+                        <location>filesystem:src/main/resources/db</location>
                     </locations>
                 </configuration>
             </plugin>
