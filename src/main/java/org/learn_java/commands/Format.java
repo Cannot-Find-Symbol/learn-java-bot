@@ -3,7 +3,6 @@ package org.learn_java.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import org.apache.commons.lang3.StringUtils;
-
 import java.math.BigInteger;
 
 public class Format extends Command {
@@ -47,8 +46,6 @@ public class Format extends Command {
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
             String wrappedMessage = String.format("```%s\n%s\n```", language, message.getContentRaw());
             message.getChannel().sendMessage(wrappedMessage).queue();
-        }, error -> {
-            event.getChannel().sendMessage("Something bad happened, couldn't format").queue();
-        });
+        }, error -> event.getChannel().sendMessage("Something bad happened, couldn't format").queue());
     }
 }

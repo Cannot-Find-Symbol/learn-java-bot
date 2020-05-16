@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 public class Code extends Command {
 
-    private Message message;
+    private final Message message;
 
     public Code(){
         this.name = "code";
