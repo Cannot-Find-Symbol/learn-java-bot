@@ -21,6 +21,7 @@ public class BotRunner implements CommandLineRunner {
     private final Command[] commands;
     private final Config config;
 
+
     public BotRunner(Command[] commands, Config config){
         this.commands = commands;
         this.config = config;
