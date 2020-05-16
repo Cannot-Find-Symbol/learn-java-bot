@@ -1,10 +1,12 @@
-package org.learn_java.commands;
+package org.learn_java.bot.commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.math.BigInteger;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Format extends Command {
 
   private static final BigInteger MAX_MESSAGE_ID = new BigInteger(String.valueOf(Long.MAX_VALUE));

@@ -1,4 +1,4 @@
-package org.learn_java.event.listeners.code_block;
+package org.learn_java.bot.event.listeners.code_block;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;

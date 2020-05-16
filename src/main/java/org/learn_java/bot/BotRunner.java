@@ -1,4 +1,4 @@
-package org.learn_java;
+package org.learn_java.bot;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -6,7 +6,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.learn_java.configuration.Config;
+import org.learn_java.bot.configuration.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

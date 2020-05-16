@@ -1,4 +1,4 @@
-package org.learn_java.event.listeners.code_block;
+package org.learn_java.bot.event.listeners.code_block;
 
 import com.vdurmont.emoji.EmojiManager;
 import java.util.*;
@@ -13,7 +13,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CodeBlockListener extends ListenerAdapter {
 
   private static final String THUMBS_UP;
