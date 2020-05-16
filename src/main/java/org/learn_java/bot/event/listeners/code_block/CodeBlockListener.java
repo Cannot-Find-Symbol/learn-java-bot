@@ -22,6 +22,7 @@ public class CodeBlockListener extends ListenerAdapter {
   private static final String THUMBS_DOWN = EmojiManager.getForAlias("thumbsdown").getUnicode();
   private static final String DELETE = EmojiManager.getForAlias("x").getUnicode();
   private static final String NUMBERS = EmojiManager.getForAlias("1234").getUnicode();
+  private final String roleRequired = "trusted";
 
   static {
     THUMBS_UP = EmojiManager.getForAlias("thumbsup").getUnicode();
@@ -51,8 +52,13 @@ public class CodeBlockListener extends ListenerAdapter {
     Message messageToFormat =
         event.getReaction().getChannel().retrieveMessageById(messageId).complete();
 
+    boolean hasPermission =
+        event.getMember().getRoles().stream()
+            .map(Role::getName)
+            .anyMatch(e -> e.equals(roleRequired));
+
     if (NUMBERS.equals(emote)) {
-      if (event.getUser().equals(messageToFormat.getAuthor())) {
+      if (event.getUser().equals(messageToFormat.getAuthor()) || hasPermission) {
         handleFormattingCodeBlock(messageToFormat);
       }
     }
