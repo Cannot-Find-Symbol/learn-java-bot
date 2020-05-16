@@ -4,26 +4,26 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class Config {
 
-    @Value("${discord.key}")
-    private String discordKey;
-    @Value("${bot.prefix}")
-    private String prefix;
-    @Value("${bot.ownerid}")
-    private String owner;
+  @Value("${discord.key}")
+  private String discordKey;
 
-    public Config() {
-    }
+  @Value("${bot.prefix}")
+  private String prefix;
 
-    public String getDiscordKey() {
-        return discordKey;
-    }
+  @Value("${bot.ownerid}")
+  private String owner;
 
-    public String getPrefix() {
-        return prefix;
-    }
+  public Config() {}
 
-    public String getOwner() {
-        return owner;
-    }
+  public String getDiscordKey() {
+    return discordKey;
+  }
 
+  public String getPrefix() {
+    return prefix;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
 }
