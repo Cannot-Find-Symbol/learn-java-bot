@@ -1,4 +1,4 @@
-package org.learn_java.commands;
+package org.learn_java.bot.commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
-import org.learn_java.data.repositories.InfoRepository;
+import org.learn_java.bot.data.repositories.InfoRepository;
 
 public class Info extends Command {
   private final InfoRepository repository;
@@ -45,7 +45,7 @@ public class Info extends Command {
     if (args[0].equals("topics")) {
       List<String> topics =
           repository.findAll().stream()
-              .map(org.learn_java.data.entities.Info::getTopic)
+              .map(org.learn_java.bot.data.entities.Info::getTopic)
               .collect(Collectors.toList());
       EmbedBuilder builder = new EmbedBuilder();
       StringBuilder sb = builder.getDescriptionBuilder();
@@ -73,7 +73,7 @@ public class Info extends Command {
               .queue();
           return;
         }
-        repository.save(new org.learn_java.data.entities.Info(args[1], args[2]));
+        repository.save(new org.learn_java.bot.data.entities.Info(args[1], args[2]));
 
         break;
       case "delete":
@@ -99,7 +99,7 @@ public class Info extends Command {
         if (repository.existsById(args[0])) {
           event.getChannel().sendMessage("Failed to update tag, possibly doesn't exist?").queue();
         } else {
-          repository.save(new org.learn_java.data.entities.Info(args[1], args[2]));
+          repository.save(new org.learn_java.bot.data.entities.Info(args[1], args[2]));
         }
 
         break;

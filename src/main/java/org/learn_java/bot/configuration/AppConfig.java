@@ -1,10 +1,10 @@
-package org.learn_java.configuration;
+package org.learn_java.bot.configuration;
 
-import org.learn_java.commands.Code;
-import org.learn_java.commands.Format;
-import org.learn_java.commands.Info;
-import org.learn_java.data.repositories.InfoRepository;
-import org.learn_java.event.listeners.code_block.CodeBlockListener;
+import org.learn_java.bot.commands.Code;
+import org.learn_java.bot.commands.Format;
+import org.learn_java.bot.commands.Info;
+import org.learn_java.bot.data.repositories.InfoRepository;
+import org.learn_java.bot.event.listeners.code_block.CodeBlockListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

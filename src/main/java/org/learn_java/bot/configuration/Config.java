@@ -1,4 +1,4 @@
-package org.learn_java.configuration;
+package org.learn_java.bot.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 

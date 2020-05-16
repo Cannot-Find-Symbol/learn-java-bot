@@ -1,4 +1,4 @@
-package org.learn_java.event.listeners.code_block;
+package org.learn_java.bot.event.listeners.code_block;
 
 import com.vdurmont.emoji.EmojiManager;
 import java.util.*;

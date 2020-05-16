@@ -1,4 +1,4 @@
-package org.learn_java.data.entities;
+package org.learn_java.bot.data.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
