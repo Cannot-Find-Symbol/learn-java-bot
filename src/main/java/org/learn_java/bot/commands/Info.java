@@ -31,11 +31,11 @@ public class Info extends Command {
       repository
           .findById(args[0])
           .ifPresentOrElse(
-              tag -> event.getChannel().sendMessage(tag.getMessage()).queue(),
+              topic -> event.getChannel().sendMessage(topic.getMessage()).queue(),
               () ->
                   event
                       .getChannel()
-                      .sendMessage("Sorry, couldn't find a tag by that name")
+                      .sendMessage("Sorry, couldn't find a topic by that name")
                       .queue());
 
       return;

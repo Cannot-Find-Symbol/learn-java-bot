@@ -20,8 +20,8 @@ public class Info {
     return topic;
   }
 
-  public void setTopic(String tagName) {
-    this.topic = tagName;
+  public void setTopic(String topic) {
+    this.topic = topic;
   }
 
   public String getMessage() {
