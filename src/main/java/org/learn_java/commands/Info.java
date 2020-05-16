@@ -2,6 +2,7 @@ package org.learn_java.commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 import org.jooq.exception.DataAccessException;
 import org.learn_java.data.dto.InfoDTO;
@@ -10,10 +11,11 @@ import org.learn_java.data.repositories.InfoRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Info extends Command {
     private final InfoRepository repository = new InfoRepository();
-    private final List<String> validCommands = Arrays.asList("add", "update", "delete");
+    private final List<String> validCommands = Arrays.asList("add", "update", "delete", "topics");
     private static final String addRole = "infomaster";
 
     public Info() {
@@ -36,11 +38,25 @@ public class Info extends Command {
             return;
         }
 
+
         boolean hasPermission = event.getMember()
                                      .getRoles()
                                      .stream()
                                      .map(Role::getName)
                                      .anyMatch(e -> e.equals(addRole));
+
+
+        if(args[0].equals("topics")){
+            List<String> topics = repository.getAll().stream().map(InfoDTO::getTagName).collect(Collectors.toList());
+            EmbedBuilder builder = new EmbedBuilder();
+            StringBuilder sb = builder.getDescriptionBuilder();
+            builder.setTitle("List of topics");
+            int[] listNumber = {1};
+            topics.forEach(topic -> sb.append(listNumber[0]++).append(". ").append(topic).append("\n"));
+            builder.setDescription(sb.toString());
+            event.getChannel().sendMessage(builder.build()).queue();
+            return;
+        }
 
 
         if (!hasPermission) {
