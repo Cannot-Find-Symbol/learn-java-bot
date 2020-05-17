@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Warn extends Command {
 
-  WarnRepository repository;
+  final WarnRepository repository;
 
   public Warn(WarnRepository repository) {
     this.repository = repository;
