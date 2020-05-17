@@ -27,7 +27,6 @@ public class BotRunner implements CommandLineRunner {
     this.config = config;
   }
 
-
   @Override
   public void run(String... args) {
     CommandClientBuilder builder = new CommandClientBuilder();
