@@ -20,8 +20,9 @@ public class Free extends Command {
   @Override
   protected void execute(CommandEvent event) {
     TextChannel channel = event.getTextChannel();
-    if (channel.getName().contains(FREE_EMOJI)) {
-      event.reply("This channel is already free");
+    String channelName = channel.getName();
+    if (channelName.contains(FREE_EMOJI) || !channelName.contains("help")) {
+      event.reply("This channel is already free or is unable to be freed");
     } else {
       String originalName = stripEmojis(channel.getName());
       channel.getManager().setName(originalName + FREE_EMOJI).queue();
