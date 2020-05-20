@@ -64,9 +64,9 @@ public class FreeListener extends ListenerAdapter {
         (k, v) -> {
           TextChannel channel = jda.getTextChannelById(k);
           if (channel != null && channel.hasLatestMessage()) {
-              if(channel.getName().contains(FREE_EMOJI)){
-                  return;
-              }
+            if (channel.getName().contains(FREE_EMOJI)) {
+              return;
+            }
             String latestMessageId = channel.getLatestMessageId();
             channel
                 .retrieveMessageById(latestMessageId)
