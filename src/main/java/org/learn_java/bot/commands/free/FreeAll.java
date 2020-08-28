@@ -18,5 +18,4 @@ public class FreeAll extends Free {
         .filter(channel -> isValidForFree(channel.getName()))
         .forEach(channel -> setNameFree(channel.getManager()));
   }
-  
 }
