@@ -20,7 +20,7 @@ public class FreeListener extends ListenerAdapter {
 
   private static final String FREE_EMOJI = EmojiManager.getForAlias("free").getUnicode();
   private static final String TAKEN_EMOJI = EmojiManager.getForAlias("x").getUnicode();
-  private static final Duration ONE_HOUR = Duration.ofHours(1);
+  private static final Duration TWO_HOURS = Duration.ofHours(2);
 
   Map<String, ChannelManager> helpChannels = new HashMap<>();
   Map<String, String> originalNames = new HashMap<>();
@@ -74,13 +74,10 @@ public class FreeListener extends ListenerAdapter {
                     e -> {
                       OffsetDateTime lastMessage = e.getTimeCreated();
                       OffsetDateTime limit =
-                          OffsetDateTime.now(lastMessage.getOffset()).minus(ONE_HOUR);
+                          OffsetDateTime.now(lastMessage.getOffset()).minus(TWO_HOURS);
 
                       if (lastMessage.isBefore(limit)) {
                         v.setName(originalNames.get(k) + FREE_EMOJI).queue();
-                        channel
-                            .sendMessage("Channel is being freed due to one hour of inactivity")
-                            .queue();
                       }
                     });
           }
