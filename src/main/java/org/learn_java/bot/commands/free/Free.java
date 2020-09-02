@@ -13,21 +13,21 @@ public class Free extends Command {
   private static final String FREE_EMOJI = EmojiManager.getForAlias("free").getUnicode();
   private static final String TAKEN_EMOJI = EmojiManager.getForAlias("x").getUnicode();
 
-  public Free() {
-    this.name = "free";
-    this.cooldown = 5;
-  }
-
-  protected boolean isValidForFree(String name) {
+  protected static boolean isValidForFree(String name) {
     return name.contains(TAKEN_EMOJI) || name.contains("help");
   }
 
-  public String stripEmojis(String channelName) {
+  protected static String stripEmojis(String channelName) {
     return channelName.replaceAll(TAKEN_EMOJI, "");
   }
 
-  protected void setNameFree(ChannelManager channel) {
+  protected static void setNameFree(ChannelManager channel) {
     channel.setName(stripEmojis(channel.getChannel().getName()) + FREE_EMOJI);
+  }
+
+  public Free() {
+    this.name = "free";
+    this.cooldown = 5;
   }
 
   @Override
