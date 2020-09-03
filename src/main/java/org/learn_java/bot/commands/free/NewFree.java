@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.managers.ChannelManager;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Free extends Command {
+public class NewFree extends Command {
 
   private static final String FREE_EMOJI = EmojiManager.getForAlias("free").getUnicode();
   private static final String TAKEN_EMOJI = EmojiManager.getForAlias("x").getUnicode();
@@ -25,8 +25,8 @@ public class Free extends Command {
     channel.setName(stripEmojis(channel.getChannel().getName()) + FREE_EMOJI);
   }
 
-  public Free() {
-    this.name = "free";
+  public NewFree() {
+    this.name = "cooler-free";
     this.cooldown = 5;
   }
 

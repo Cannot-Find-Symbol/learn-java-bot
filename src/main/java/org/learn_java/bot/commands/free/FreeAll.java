@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FreeAll extends Free {
+public class FreeAll extends NewFree {
 
   public FreeAll() {
     this.name = "free-all";
