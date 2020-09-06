@@ -21,7 +21,7 @@ public class Kick extends Command {
     if (args.length > 0) event.reply("Please specify : @users ... <reason>");
     else {
       String reason =
-          Arrays.stream(args).filter(arg -> arg.startsWith("@")).collect(Collectors.joining(" "));
+          Arrays.stream(args).filter(arg -> !arg.startsWith("<@")).collect(Collectors.joining(" "));
       event
           .getMessage()
           .getMentionedMembers()

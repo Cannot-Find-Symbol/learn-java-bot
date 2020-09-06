@@ -2,7 +2,7 @@ package org.learn_java.bot.commands.moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -32,12 +32,13 @@ public class Warn extends Command {
     String command = event.getArgs().split("\\s+")[0];
 
     if (command.equals("show") && !users.isEmpty()) {
-      String username = users.get(0).getAsTag();
-      List<org.learn_java.bot.data.entities.Warn> warns = repository.findByUsername(username);
+      User user = users.get(0);
+      List<org.learn_java.bot.data.entities.Warn> warns =
+          repository.findByUser_ID(user.getIdLong());
       EmbedBuilder eb = new EmbedBuilder();
-      eb.setTitle("Warns for @" + username);
+      eb.setTitle("Warns for @" + user.getAsTag());
       warns.forEach(warn -> eb.addField("Warn on " + warn.getDate(), warn.getReason(), false));
-      event.getChannel().sendMessage(eb.build()).queue();
+      event.reply(eb.build());
       return;
     }
 
@@ -45,15 +46,18 @@ public class Warn extends Command {
 
     List<org.learn_java.bot.data.entities.Warn> warns = new ArrayList<>();
     args.stream()
-        .filter(m -> !m.startsWith("<@") && !m.endsWith(">"))
+        .filter(m -> !m.startsWith("<@"))
         .findFirst()
-        .ifPresent(
+        .ifPresentOrElse(
             reason ->
                 users.forEach(
                     user ->
                         warns.add(
                             new org.learn_java.bot.data.entities.Warn(
-                                user.getAsTag(), reason, LocalDate.now()))));
+                                user.getIdLong(), reason, LocalDateTime.now()))),
+            () -> {
+              event.reply("A reason is mandatory");
+            });
     repository.saveAll(warns);
   }
 }
