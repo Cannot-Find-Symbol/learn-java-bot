@@ -35,10 +35,7 @@ public class BotRunner implements CommandLineRunner {
     builder.addCommands(commands);
     CommandClient client = builder.build();
     try {
-      JDABuilder.createDefault(config.getDiscordKey())
-          .addEventListeners(client)
-          .addEventListeners(listeners)
-          .build();
+      JDABuilder.createDefault(config.getDiscordKey()).addEventListeners(client, listeners).build();
     } catch (LoginException e) {
       logger.error("Invalid API key, check application.properties");
     }

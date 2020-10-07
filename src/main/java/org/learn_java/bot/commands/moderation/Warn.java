@@ -33,8 +33,7 @@ public class Warn extends Command {
 
     if (command.equals("show") && !users.isEmpty()) {
       User user = users.get(0);
-      List<org.learn_java.bot.data.entities.Warn> warns =
-          repository.findByUser_ID(user.getIdLong());
+      List<org.learn_java.bot.data.entities.Warn> warns = repository.findByUserID(user.getIdLong());
       EmbedBuilder eb = new EmbedBuilder();
       eb.setTitle("Warns for @" + user.getAsTag());
       warns.forEach(warn -> eb.addField("Warn on " + warn.getDate(), warn.getReason(), false));
@@ -55,9 +54,7 @@ public class Warn extends Command {
                         warns.add(
                             new org.learn_java.bot.data.entities.Warn(
                                 user.getIdLong(), reason, LocalDateTime.now()))),
-            () -> {
-              event.reply("A reason is mandatory");
-            });
+            () -> event.reply("A reason is mandatory"));
     repository.saveAll(warns);
   }
 }

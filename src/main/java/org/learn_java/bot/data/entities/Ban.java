@@ -8,37 +8,39 @@ import javax.persistence.Id;
 @Entity
 public class Ban {
   @Id @GeneratedValue private long id;
-  private final long user_id;
-  private final String reason;
-  private final boolean is_premanent;
-  private LocalDateTime unban_date;
+  private long userID;
+  private String reason;
+  private boolean isPermanent;
+  private LocalDateTime unbanDate;
+
+  protected Ban() {}
 
   public Ban(long id, String reason, LocalDateTime unban_date) {
-    this.user_id = id;
+    this.userID = id;
     this.reason = reason;
-    this.is_premanent = false;
-    this.unban_date = unban_date;
+    this.isPermanent = false;
+    this.unbanDate = unban_date;
   }
 
   public Ban(long id, String reason) {
-    this.user_id = id;
+    this.userID = id;
     this.reason = reason;
-    this.is_premanent = true;
+    this.isPermanent = true;
   }
 
-  public long getId() {
-    return user_id;
+  public long getUserID() {
+    return userID;
   }
 
   public String getReason() {
     return reason;
   }
 
-  public boolean isPremanent() {
-    return is_premanent;
+  public LocalDateTime getDate() {
+    return unbanDate;
   }
 
-  public LocalDateTime getDate() {
-    return unban_date;
+  public boolean isPermanent() {
+    return isPermanent;
   }
 }

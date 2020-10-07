@@ -8,18 +8,20 @@ import javax.persistence.Id;
 @Entity
 public class Warn {
   @Id @GeneratedValue private long id;
-  private long user_id;
-  private final String reason;
-  private final LocalDateTime date;
+  private long userID;
+  private String reason;
+  private LocalDateTime date;
 
-  public Warn(long username, String reason, LocalDateTime date) {
-    this.id = username;
+  protected Warn() {}
+
+  public Warn(long userId, String reason, LocalDateTime date) {
+    this.userID = userId;
     this.reason = reason;
     this.date = date;
   }
 
-  public long getId() {
-    return user_id;
+  public long getUserID() {
+    return userID;
   }
 
   public String getReason() {

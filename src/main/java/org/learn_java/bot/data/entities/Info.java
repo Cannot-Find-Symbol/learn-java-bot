@@ -9,7 +9,7 @@ public class Info {
   @Id private String topic;
   private String message;
 
-  public Info() {}
+  protected Info() {}
 
   public Info(String topic, String message) {
     this.topic = topic;
