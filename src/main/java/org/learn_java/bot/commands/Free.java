@@ -27,6 +27,7 @@ public class Free extends Command {
       String originalName = stripEmojis(channel.getName());
       channel.getManager().setName(originalName + FREE_EMOJI).queue();
     }
+    event.getMessage().delete().queue();
   }
 
   public String stripEmojis(String channelName) {
