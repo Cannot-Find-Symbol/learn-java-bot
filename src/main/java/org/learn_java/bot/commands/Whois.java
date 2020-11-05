@@ -24,10 +24,7 @@ public class Whois extends Command {
 
   @Override
   protected void execute(CommandEvent event) {
-    String[] args = event.getArgs().split(" ");
-    String memberName = args.length > 0 ? args[0] : "";
-
-    List<Member> members = event.getGuild().getMembersByEffectiveName(memberName, true);
+    List<Member> members = event.getMessage().getMentionedMembers();
     Member member = members.size() > 0 ? members.get(0) : null;
 
     if (member == null) {
