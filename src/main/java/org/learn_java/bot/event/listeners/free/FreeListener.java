@@ -85,7 +85,15 @@ public class FreeListener extends ListenerAdapter {
                               .minus(Duration.ofHours(hours));
 
                       if (lastMessage.isBefore(limit)) {
-                        v.setName(originalNames.get(k) + FREE_EMOJI).queue();
+                        v.setName(originalNames.get(k) + FREE_EMOJI)
+                            .queue(
+                                (success) ->
+                                    channel
+                                        .sendMessage(
+                                            String.format(
+                                                "Channel being freed for reaching inactivity limit of %d hour/s",
+                                                hours))
+                                        .queue());
                       }
                     });
           }
