@@ -4,17 +4,20 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.math.BigInteger;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "format.enabled", havingValue = "true", matchIfMissing = true)
 public class Format extends Command {
 
   private static final BigInteger MAX_MESSAGE_ID = new BigInteger(String.valueOf(Long.MAX_VALUE));
 
-  public Format() {
+  public Format(@Value("${format.cooldown:15}") int cooldown) {
     this.name = "format";
     this.help = "Formats users non formatted message";
-    this.cooldown = 20;
+    this.cooldown = cooldown;
   }
 
   @Override

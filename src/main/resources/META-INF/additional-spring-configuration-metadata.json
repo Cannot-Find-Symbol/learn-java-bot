@@ -14,5 +14,60 @@
       "name": "discord.key",
       "type": "java.lang.String",
       "description": "API Key for discord."
+    },
+    {
+      "name": "free.hours",
+      "type": "java.lang.Integer",
+      "description": "Description for free.hours."
+    },
+    {
+      "name": "format.cooldown",
+      "type": "java.lang.Integer",
+      "description": "Description for format.cooldown."
+    },
+    {
+      "name": "free.cooldown",
+      "type": "java.lang.Integer",
+      "description": "Description for free.cooldown."
+    },
+    {
+      "name": "autofree.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for autofree.enabled."
+    },
+    {
+      "name": "free.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for free.enabled."
+    },
+    {
+      "name": "info.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for info.enabled."
+    },
+    {
+      "name": "format.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for format.enabled."
+    },
+    {
+      "name": "codeblocks.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for codeblocks.enabled."
+    },
+    {
+      "name": "whois.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for whois.enabled."
+    },
+    {
+      "name": "warn.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for warn.enabled."
+    },
+    {
+      "name": "code.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for code.enabled."
     }
   ] }

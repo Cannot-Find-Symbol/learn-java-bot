@@ -4,17 +4,20 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.vdurmont.emoji.EmojiManager;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "free.enabled", havingValue = "true", matchIfMissing = true)
 public class Free extends Command {
 
   private static final String FREE_EMOJI = EmojiManager.getForAlias("free").getUnicode();
   private static final String TAKEN_EMOJI = EmojiManager.getForAlias("x").getUnicode();
 
-  public Free() {
+  public Free(@Value("${free.cooldown:5}") int cooldown) {
     this.name = "free";
-    this.cooldown = 5;
+    this.cooldown = cooldown;
   }
 
   @Override

@@ -3,6 +3,23 @@ discord.key=abcdefjijklmnopqrstuvwxyz
 bot.prefix=!
 bot.ownerid=123456789
 
+#listeners
+autofree.enabled=true
+codeblocks.enabled=true
+
+#commands
+code.enabled=true
+free.enabled=true
+format.enabled=true
+info.enabled=true
+warn.enabled=false
+whois.enabled=true
+
+#values
+free.hours=3
+format.cooldown=20
+free.cooldown=5
+
 #Spring properties
 spring.jpa.hibernate.ddl-auto=update
 spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
