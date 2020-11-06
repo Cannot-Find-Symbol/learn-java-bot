@@ -3,9 +3,11 @@ package org.learn_java.bot.commands.moderation;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import org.learn_java.bot.data.repositories.SpamRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "spam.enabled", havingValue = "true", matchIfMissing = true)
 public class Spam extends Command {
   private SpamRepository repository;
 

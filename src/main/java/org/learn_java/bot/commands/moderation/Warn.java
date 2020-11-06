@@ -8,9 +8,11 @@ import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import org.learn_java.bot.data.repositories.WarnRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "warn.enabled", havingValue = "true", matchIfMissing = true)
 public class Warn extends Command {
 
   final WarnRepository repository;

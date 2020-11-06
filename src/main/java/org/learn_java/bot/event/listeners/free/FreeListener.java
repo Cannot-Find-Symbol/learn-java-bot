@@ -12,19 +12,26 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.ChannelManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "autofree.enabled", havingValue = "true", matchIfMissing = true)
 public class FreeListener extends ListenerAdapter {
 
   private static final String FREE_EMOJI = EmojiManager.getForAlias("free").getUnicode();
   private static final String TAKEN_EMOJI = EmojiManager.getForAlias("x").getUnicode();
-  private static final Duration TWO_HOURS = Duration.ofHours(2);
 
-  Map<String, ChannelManager> helpChannels = new HashMap<>();
-  Map<String, String> originalNames = new HashMap<>();
+  private final Map<String, ChannelManager> helpChannels = new HashMap<>();
+  private final Map<String, String> originalNames = new HashMap<>();
+  private final int hours;
   private JDA jda;
+
+  public FreeListener(@Value("${free.hours:3}") int hours) {
+    this.hours = hours;
+  }
 
   @Override
   public void onReady(@Nonnull ReadyEvent event) {
@@ -74,7 +81,8 @@ public class FreeListener extends ListenerAdapter {
                     e -> {
                       OffsetDateTime lastMessage = e.getTimeCreated();
                       OffsetDateTime limit =
-                          OffsetDateTime.now(lastMessage.getOffset()).minus(TWO_HOURS);
+                          OffsetDateTime.now(lastMessage.getOffset())
+                              .minus(Duration.ofHours(hours));
 
                       if (lastMessage.isBefore(limit)) {
                         v.setName(originalNames.get(k) + FREE_EMOJI).queue();

@@ -5,9 +5,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.learn_java.bot.data.repositories.SpamRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "spam.enabled", havingValue = "true", matchIfMissing = true)
 public class SpamListener extends ListenerAdapter {
 
   private SpamRepository repository;

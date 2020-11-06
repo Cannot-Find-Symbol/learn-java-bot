@@ -8,20 +8,23 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 import org.learn_java.bot.data.repositories.InfoRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "info.enabled", havingValue = "true", matchIfMissing = true)
 public class Info extends Command {
   private final InfoRepository repository;
 
   private final List<String> validCommands = Arrays.asList("add", "update", "delete", "topics");
   private static final String addRole = "infomaster";
 
-  public Info(InfoRepository repository) {
+  public Info(InfoRepository repository, @Value("${info.cooldown:5}") int cooldown) {
     this.repository = repository;
     this.name = "info";
     this.help = "";
-    this.cooldown = 3;
+    this.cooldown = cooldown;
   }
 
   @Override

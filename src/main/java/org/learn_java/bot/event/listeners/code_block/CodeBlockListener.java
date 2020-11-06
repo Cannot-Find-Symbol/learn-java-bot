@@ -13,9 +13,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "codeblocks.enabled", havingValue = "true", matchIfMissing = true)
 public class CodeBlockListener extends ListenerAdapter {
 
   private static final String THUMBS_UP = EmojiManager.getForAlias("thumbsup").getUnicode();

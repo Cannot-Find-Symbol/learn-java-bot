@@ -9,17 +9,20 @@ import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "whois.enabled", havingValue = "true", matchIfMissing = true)
 public class Whois extends Command {
 
   private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-  public Whois() {
+  public Whois(@Value("${whois.cooldown:20}") int cooldown) {
     this.name = "whois";
     this.help = "gives information about the member";
-    this.cooldown = 20;
+    this.cooldown = cooldown;
   }
 
   @Override
