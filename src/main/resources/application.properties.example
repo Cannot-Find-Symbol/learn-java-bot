@@ -12,7 +12,8 @@ code.enabled=true
 free.enabled=true
 format.enabled=true
 info.enabled=true
-warn.enabled=false
+spam.enabled=true
+warn.enabled=true
 whois.enabled=true
 
 #values

@@ -69,5 +69,10 @@
       "name": "code.enabled",
       "type": "java.lang.Boolean",
       "description": "Description for code.enabled."
+    },
+    {
+      "name": "spam.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for spam.enabled."
     }
   ] }

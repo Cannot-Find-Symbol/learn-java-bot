@@ -86,9 +86,6 @@ public class FreeListener extends ListenerAdapter {
 
                       if (lastMessage.isBefore(limit)) {
                         v.setName(originalNames.get(k) + FREE_EMOJI).queue();
-                        channel
-                            .sendMessage("Channel is being freed due to one hour of inactivity")
-                            .queue();
                       }
                     });
           }
