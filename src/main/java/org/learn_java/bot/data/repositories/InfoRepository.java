@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @ConditionalOnProperty(value = "info.enabled", havingValue = "true", matchIfMissing = true)
-public interface InfoRepository extends JpaRepository<Info, String> {}
+public interface InfoRepository extends JpaRepository<Info, String> {
+}

@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(value = "spam.enabled", havingValue = "true", matchIfMissing = true)
 public interface SpamRepository extends JpaRepository<Spam, Long> {
-  Spam findByMessage(String message);
+    Spam findByMessage(String message);
 }

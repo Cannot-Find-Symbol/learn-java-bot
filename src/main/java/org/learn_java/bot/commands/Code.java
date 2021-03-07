@@ -11,26 +11,26 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "code.enabled", havingValue = "true", matchIfMissing = true)
 public class Code extends Command {
 
-  private final Message message;
+    private final Message message;
 
-  public Code() {
-    this.name = "code";
-    message = buildMessage();
-  }
+    public Code() {
+        this.name = "code";
+        message = buildMessage();
+    }
 
-  private Message buildMessage() {
-    MessageBuilder builder = new MessageBuilder();
-    builder.append("\nPlease format your code using the following format\n");
-    builder.append("\\`\\`\\`java\n");
-    builder.append("//your code");
-    builder.append("\n\\`\\`\\`");
-    builder.append("\n Which will result in a code block such as");
-    builder.appendCodeBlock("int x = 3;\nSystem.out.println(x);", "java");
-    return builder.build();
-  }
+    private Message buildMessage() {
+        MessageBuilder builder = new MessageBuilder();
+        builder.append("\nPlease format your code using the following format\n");
+        builder.append("\\`\\`\\`java\n");
+        builder.append("//your code");
+        builder.append("\n\\`\\`\\`");
+        builder.append("\n Which will result in a code block such as");
+        builder.appendCodeBlock("int x = 3;\nSystem.out.println(x);", "java");
+        return builder.build();
+    }
 
-  @Override
-  protected void execute(CommandEvent commandEvent) {
-    commandEvent.reply(message);
-  }
+    @Override
+    protected void execute(CommandEvent commandEvent) {
+        commandEvent.reply(message);
+    }
 }
