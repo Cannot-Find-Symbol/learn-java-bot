@@ -4,12 +4,14 @@ import org.learn_java.bot.configuration.Mapper;
 import org.learn_java.bot.data.dtos.WarnDTO;
 import org.learn_java.bot.data.entities.Warn;
 import org.learn_java.bot.data.repositories.WarnRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnProperty(value = "warn.enabled", havingValue = "true", matchIfMissing = true)
 public class WarnService {
 
     private WarnRepository repository;

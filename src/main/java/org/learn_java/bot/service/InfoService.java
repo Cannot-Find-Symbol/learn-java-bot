@@ -4,6 +4,7 @@ import org.learn_java.bot.configuration.Mapper;
 import org.learn_java.bot.data.dtos.InfoDTO;
 import org.learn_java.bot.data.entities.Info;
 import org.learn_java.bot.data.repositories.InfoRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnProperty(value = "info.enabled", havingValue = "true", matchIfMissing = true)
 public class InfoService {
 
     private InfoRepository repository;
