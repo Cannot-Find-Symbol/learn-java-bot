@@ -2,17 +2,18 @@ package org.learn_java.bot.commands.moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import org.learn_java.bot.data.repositories.SpamRepository;
+import org.learn_java.bot.data.entities.Spam;
+import org.learn_java.bot.service.SpamService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(value = "spam.enabled", havingValue = "true", matchIfMissing = true)
-public class Spam extends Command {
-    private final SpamRepository repository;
+public class SpamCommand extends Command {
+    private final SpamService service;
 
-    public Spam(SpamRepository repository) {
-        this.repository = repository;
+    public SpamCommand(SpamService service) {
+        this.service = service;
         this.name = "spam";
         this.requiredRole = "moderator";
     }
@@ -22,8 +23,8 @@ public class Spam extends Command {
         if (event.getAuthor().isBot())
             return;
         String message = event.getArgs().trim();
-        if (repository.findByMessage(message) == null) {
-            repository.save(new org.learn_java.bot.data.entities.Spam(message));
+        if (service.findMessage(message) == null) {
+            service.save(new Spam(message));
         } else {
             event.reply("That message already exists");
         }

@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(value = "free.enabled", havingValue = "true", matchIfMissing = true)
-public class Free extends Command {
+public class FreeCommand extends Command {
 
     private static final String FREE_EMOJI = EmojiManager.getForAlias("free").getUnicode();
     private static final String TAKEN_EMOJI = EmojiManager.getForAlias("x").getUnicode();
 
-    public Free(@Value("${free.cooldown:5}") int cooldown) {
+    public FreeCommand(@Value("${free.cooldown:5}") int cooldown) {
         this.name = "free";
         this.cooldown = cooldown;
     }

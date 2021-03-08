@@ -16,11 +16,11 @@ import java.util.List;
 
 @Component
 @ConditionalOnProperty(value = "whois.enabled", havingValue = "true", matchIfMissing = true)
-public class Whois extends Command {
+public class WhoisCommand extends Command {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public Whois(@Value("${whois.cooldown:20}") int cooldown) {
+    public WhoisCommand(@Value("${whois.cooldown:20}") int cooldown) {
         this.name = "whois";
         this.help = "gives information about the member";
         this.cooldown = cooldown;
