@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(value = "code.enabled", havingValue = "true", matchIfMissing = true)
-public class Code extends Command {
+public class CodeCommand extends Command {
 
     private final Message message;
 
-    public Code() {
+    public CodeCommand() {
         this.name = "code";
         message = buildMessage();
     }

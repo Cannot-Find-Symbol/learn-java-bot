@@ -11,11 +11,11 @@ import java.math.BigInteger;
 
 @Component
 @ConditionalOnProperty(value = "format.enabled", havingValue = "true", matchIfMissing = true)
-public class Format extends Command {
+public class FormatCommand extends Command {
 
     private static final BigInteger MAX_MESSAGE_ID = new BigInteger(String.valueOf(Long.MAX_VALUE));
 
-    public Format(@Value("${format.cooldown:15}") int cooldown) {
+    public FormatCommand(@Value("${format.cooldown:15}") int cooldown) {
         this.name = "format";
         this.help = "Formats users non formatted message";
         this.cooldown = cooldown;
