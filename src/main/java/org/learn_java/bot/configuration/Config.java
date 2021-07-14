@@ -15,6 +15,9 @@ public class Config {
     @Value("${bot.ownerid}")
     private String owner;
 
+    @Value("${guild.id}")
+    private String guildId;
+
     public Config() {
     }
 
@@ -28,5 +31,9 @@ public class Config {
 
     public String getOwner() {
         return owner;
+    }
+
+    public String getGuildId() {
+        return guildId;
     }
 }

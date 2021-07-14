@@ -2,6 +2,7 @@ package org.learn_java.bot.event.listeners.free;
 
 import com.vdurmont.emoji.EmojiManager;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -15,75 +16,65 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(value = "autofree.enabled", havingValue = "true", matchIfMissing = true)
 public class FreeListener extends ListenerAdapter {
-
-    private static final String FREE_EMOJI = EmojiManager.getForAlias("free").getUnicode();
-    private static final String TAKEN_EMOJI = EmojiManager.getForAlias("x").getUnicode();
-
-    private final Map<String, ChannelManager> helpChannels = new HashMap<>();
-    private final Map<String, String> originalNames = new HashMap<>();
     private final int hours;
+    private final Set<String> helpChannelIds;
+    private final String availableCategoryId;
+    private final String takenCategoryId;
     private JDA jda;
 
-    public FreeListener(@Value("${free.hours:3}") int hours) {
+
+    public FreeListener(@Value("${free.hours:3}") int hours,
+                        @Value("${help.channelids}") String helpChannelIds,
+                        @Value("${available.categoryid}") String availableCategoryId,
+                        @Value("${taken.categoryid}") String takenCategoryId) {
         this.hours = hours;
+        this.helpChannelIds = new HashSet<>(Arrays.asList(helpChannelIds.split(",")));
+        this.availableCategoryId = availableCategoryId;
+        this.takenCategoryId = takenCategoryId;
     }
 
     @Override
     public void onReady(@Nonnull ReadyEvent event) {
         jda = event.getJDA();
-        jda.getGuilds()
-                .forEach(guild -> guild.getChannels().stream().filter(channel -> channel.getName().contains("help"))
-                        .forEach(channel -> helpChannels.put(channel.getId(), channel.getManager())));
-
-        helpChannels.forEach((k, v) -> v.setName(stripEmojis(v.getChannel().getName())).queue((complete) -> {
-            String strippedName = stripEmojis(v.getChannel().getName());
-            originalNames.put(k, strippedName);
-            v.setName(strippedName + FREE_EMOJI).queue();
-        }));
     }
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        String channelId = event.getChannel().getId();
-        if (event.getAuthor().isBot()) {
+        if(event.getAuthor().isBot()) {
             return;
         }
-        if (event.getChannel().getName().contains(FREE_EMOJI)) {
-            helpChannels.get(channelId).setName(originalNames.get(channelId) + TAKEN_EMOJI).queue();
-        }
+        moveChannel(event.getChannel(), takenCategoryId);
     }
 
-    @Scheduled(cron = "0 0/15 * * * ?")
+    private void moveChannel(TextChannel channel, String categoryId) {
+        Category parent = channel.getParent();
+        if (!helpChannelIds.contains(channel.getId()) || (parent != null && parent.getId().equals(categoryId))) {
+            return;
+        }
+        Category category = jda.getCategoryById(categoryId);
+        channel.getManager().setParent(category).queue();
+    }
+
+    @Scheduled(cron = "* 0/15 * * * ?")
     public void freeChannels() {
-        helpChannels.forEach((k, v) -> {
-            TextChannel channel = jda.getTextChannelById(k);
-            if (channel != null && channel.hasLatestMessage()) {
-                if (channel.getName().contains(FREE_EMOJI)) {
-                    return;
-                }
+        List<TextChannel> helpChannels = helpChannelIds.stream().map(jda::getTextChannelById).collect(Collectors.toList());
+        helpChannels.forEach((channel) -> {
+            if(channel.hasLatestMessage()) {
                 String latestMessageId = channel.getLatestMessageId();
                 channel.retrieveMessageById(latestMessageId).queue(e -> {
                     OffsetDateTime lastMessage = e.getTimeCreated();
                     OffsetDateTime limit = OffsetDateTime.now(lastMessage.getOffset()).minus(Duration.ofHours(hours));
-
                     if (lastMessage.isBefore(limit)) {
-                        v.setName(originalNames.get(k) + FREE_EMOJI)
-                                .queue((success) -> channel.sendMessage(String.format(
-                                        "Channel being freed for reaching inactivity limit of %d hour/s", hours))
-                                        .queue());
+                        moveChannel(channel, availableCategoryId);
                     }
                 });
             }
         });
-    }
-
-    public String stripEmojis(String channelName) {
-        return channelName.replaceAll(FREE_EMOJI, "").replaceAll(TAKEN_EMOJI, "");
     }
 }

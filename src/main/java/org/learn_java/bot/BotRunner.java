@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.security.auth.login.LoginException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class BotRunner implements CommandLineRunner {
@@ -49,9 +50,7 @@ public class BotRunner implements CommandLineRunner {
                     .build();
            jda.awaitReady();
            CommandData[] commands = Arrays.stream(slashCommands).map(SlashCommand::getCommandData).toArray(CommandData[]::new);
-           System.out.println(Arrays.toString(commands));
-           jda.updateCommands().addCommands(commands).queue();
-           jda.getGuildById("588096293620941023").updateCommands().addCommands(commands).queue();
+           Objects.requireNonNull(jda.getGuildById(config.getGuildId())).updateCommands().addCommands(commands).queue();
         } catch (LoginException | InterruptedException e) {
             logger.error("Invalid API key, check application.properties");
         }
