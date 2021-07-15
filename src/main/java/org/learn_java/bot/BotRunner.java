@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -46,7 +45,7 @@ public class BotRunner implements CommandLineRunner {
         try {
            JDA jda =  JDABuilder.createDefault(config.getDiscordKey())
                     .addEventListeners(client)
-                    .addEventListeners(listeners)
+                    .addEventListeners((Object[]) listeners)
                     .build();
            jda.awaitReady();
            CommandData[] commands = Arrays.stream(slashCommands).map(SlashCommand::getCommandData).toArray(CommandData[]::new);

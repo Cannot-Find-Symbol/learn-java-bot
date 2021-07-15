@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @ConditionalOnProperty(value = "warn.enabled", havingValue = "true", matchIfMissing = true)
@@ -30,24 +31,23 @@ public class WarnCommand extends Command {
     protected void execute(CommandEvent event) {
         String[] args = event.getArgs().split("\\s+", 2);
 
-        User user = event.getMessage().getMentionedUsers()
+        Optional<User> user = event.getMessage().getMentionedUsers()
                 .stream()
-                .findFirst()
-                .orElse(null);
+                .findFirst();
 
-        if(user == null) {
+        if(user.isEmpty()) {
             event.reply("User cannot be blank");
             return;
         }
 
         if (event.getArgs().startsWith("show")) {
-            handleShow(user.getAsTag(), event.getTextChannel());
+            handleShow(user.get().getAsTag(), event.getTextChannel());
             return;
         }
 
         String reason = args[1];
 
-        service.save(createWarn(user, reason));
+        service.save(createWarn(user.get(), reason));
     }
 
     public void handleShow(String userTag, TextChannel channel) {
@@ -55,7 +55,7 @@ public class WarnCommand extends Command {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Warns for @" + userTag);
         warns.forEach(warn -> eb.addField("Warn on " + warn.getDate(), warn.getReason(), false));
-        channel.sendMessage(eb.build()).queue();
+        channel.sendMessageEmbeds(eb.build()).queue();
     }
 
     private Warn createWarn(User user, String reason) {

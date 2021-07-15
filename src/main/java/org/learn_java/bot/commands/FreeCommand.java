@@ -2,8 +2,6 @@ package org.learn_java.bot.commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.vdurmont.emoji.EmojiManager;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -36,7 +34,7 @@ public class FreeCommand extends Command implements SlashCommand {
 
     @Override
     protected void execute(CommandEvent event) {
-
+        run(event.getTextChannel());
     }
 
     private boolean run(TextChannel channel) {
@@ -51,14 +49,10 @@ public class FreeCommand extends Command implements SlashCommand {
 
     @Override
     public void executeSlash(SlashCommandEvent event) {
-
-        if (run(event.getTextChannel())) {
-            event.reply("Channel freed")
-                    .queue((succuess) -> succuess.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
-        } else {
-            event.reply("Something went wrong")
-                    .queue((succuess) -> succuess.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
-        }
+        boolean success = run(event.getTextChannel());
+        String msg = success ? "Success" : "Unable to free";
+        event.reply(msg)
+                .queue((s) -> s.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
     }
 
     @Override
