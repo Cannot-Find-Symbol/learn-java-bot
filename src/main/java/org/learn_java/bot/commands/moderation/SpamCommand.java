@@ -20,8 +20,10 @@ public class SpamCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (event.getAuthor().isBot())
+        if (event.getAuthor().isBot()) {
             return;
+        }
+
         String message = event.getArgs().trim();
         if (service.findMessage(message) == null) {
             service.save(new Spam(message));
