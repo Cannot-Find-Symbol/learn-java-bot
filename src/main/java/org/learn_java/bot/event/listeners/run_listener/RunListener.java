@@ -101,7 +101,7 @@ public class RunListener extends ListenerAdapter {
                  }
              });
         }
-        event.getReaction().removeReaction().queue();
+        event.getReaction().clearReactions().queue();
     }
 
     private MessageEmbed buildResponse(Language language, RunResponse r) {
