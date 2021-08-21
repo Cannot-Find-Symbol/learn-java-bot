@@ -98,11 +98,10 @@ public class RunListener extends ListenerAdapter {
                      }
                  } else {
                      event.getChannel().sendMessage("Sorry, can't run this code. No language provided or language is invalid").queue();
-                     event.getReaction().removeReaction().queue();
                  }
              });
         }
-        event.getReaction().removeReaction(event.getUser()).queue();
+        event.getReaction().removeReaction().queue();
     }
 
     private MessageEmbed buildResponse(Language language, RunResponse r) {
