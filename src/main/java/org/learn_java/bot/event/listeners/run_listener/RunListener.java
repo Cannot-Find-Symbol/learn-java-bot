@@ -119,7 +119,9 @@ public class RunListener extends ListenerAdapter {
         builder.setTitle("Run Code Result");
         builder.addField("Language", language.getLanguage(), true);
         builder.addField("Version", language.getVersion(), true);
-        builder.addField("Output Truncated", Boolean.toString(output.length() > FIELD_WIDTH), true);
+        if(output.length() > FIELD_WIDTH) {
+            builder.addField("Output Truncated", Boolean.toString(true), true);
+        }
         builder.addField("Output", StringUtils.truncate(output, FIELD_WIDTH), false);
 
         return builder.build();
