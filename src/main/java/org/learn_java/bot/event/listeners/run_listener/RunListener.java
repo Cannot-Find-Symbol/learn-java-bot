@@ -18,9 +18,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nonnull;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Component
@@ -29,6 +27,7 @@ public class RunListener extends ListenerAdapter {
     private static final String EXECUTE = "https://emkc.org/api/v2/piston/execute";
     private static final String RUNTIMES = "https://emkc.org/api/v2/piston/runtimes";
     private static final String LANGUAGE_IS_INVALID = "Sorry, can't run this code. No language provided or language is invalid";
+    public static final int FIELD_WIDTH = 1024;
     private final WebClient client;
     private final Map<String, Language> languageMap;
 
@@ -111,13 +110,17 @@ public class RunListener extends ListenerAdapter {
     }
 
     private MessageEmbed buildResponse(Language language, RunResponse r) {
+        String output = r.getRun().getOutput();
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Run Code Result");
         builder.addField("Language", language.getLanguage(), true);
         builder.addField("Version", language.getVersion(), true);
-        builder.addField("Output", r.getRun().getOutput(), false);
+        builder.addField("Output Truncated", Boolean.toString(output.length() > FIELD_WIDTH), true);
+        builder.addField("Output", StringUtils.truncate(output, FIELD_WIDTH), false);
+
         return builder.build();
     }
+
 
     @Scheduled(cron = "0 0 6 * * *")
     public void refreshLanguageMap() {
