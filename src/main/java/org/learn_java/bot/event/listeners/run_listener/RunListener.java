@@ -27,7 +27,7 @@ public class RunListener extends ListenerAdapter {
     private static final String EXECUTE = "https://emkc.org/api/v2/piston/execute";
     private static final String RUNTIMES = "https://emkc.org/api/v2/piston/runtimes";
     private static final String LANGUAGE_IS_INVALID = "Sorry, can't run this code. No language provided or language is invalid";
-    public static final int FIELD_WIDTH = 1024;
+    private static final int FIELD_WIDTH = 1024;
     private final WebClient client;
     private final Map<String, Language> languageMap;
 
@@ -41,6 +41,11 @@ public class RunListener extends ListenerAdapter {
         getLanguages();
     }
 
+    @Scheduled(cron = "0 0 6 * * *")
+    public void refreshLanguageMap() {
+        getLanguages();
+    }
+
     private void getLanguages() {
         client.get().uri(RUNTIMES)
                 .retrieve()
@@ -48,16 +53,11 @@ public class RunListener extends ListenerAdapter {
                 .subscribe(this::buildLanguageMap);
     }
 
-
     private void buildLanguageMap(List<Language> languages) {
         languages.forEach(language -> {
             languageMap.put(language.getLanguage(), language);
             language.getAliases().forEach(alias -> languageMap.put(alias, language));
         });
-    }
-
-    private boolean hasCodeBlock(Message message) {
-        return StringUtils.countMatches(message.getContentRaw(), "```") == 2;
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -68,6 +68,10 @@ public class RunListener extends ListenerAdapter {
         }
 
         message.addReaction(RUNNING).queue();
+    }
+
+    private boolean hasCodeBlock(Message message) {
+        return StringUtils.countMatches(message.getContentRaw(), "```") == 2;
     }
 
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
@@ -119,11 +123,5 @@ public class RunListener extends ListenerAdapter {
         builder.addField("Output", StringUtils.truncate(output, FIELD_WIDTH), false);
 
         return builder.build();
-    }
-
-
-    @Scheduled(cron = "0 0 6 * * *")
-    public void refreshLanguageMap() {
-        getLanguages();
     }
 }
