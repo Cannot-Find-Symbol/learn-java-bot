@@ -1,4 +1,4 @@
-package org.learn_java.bot.commands;
+package org.learn_java.bot.commands.user;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

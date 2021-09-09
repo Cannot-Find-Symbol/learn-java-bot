@@ -1,4 +1,4 @@
-package org.learn_java.bot.commands;
+package org.learn_java.bot.commands.user;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -57,15 +57,9 @@ public class InfoCommand extends Command {
         }
 
         switch (command) {
-            case "add":
-                handleAdd(args, event);
-                break;
-            case "delete":
-                handleDelete(args, event);
-                break;
-            case "update":
-                handleUpdate(args, event);
-                break;
+            case "add" -> handleAdd(args, event);
+            case "delete" -> handleDelete(args, event);
+            case "update" -> handleUpdate(args, event);
         }
     }
 
@@ -85,7 +79,7 @@ public class InfoCommand extends Command {
                 .map(InfoDTO::getTopic)
                 .collect(Collectors.toList());
 
-        event.getChannel().sendMessage(buildTopicsEmbed(topics)).queue();
+        event.getChannel().sendMessageEmbeds(buildTopicsEmbed(topics)).queue();
     }
 
     public void handleAdd(String[] args, CommandEvent event) {

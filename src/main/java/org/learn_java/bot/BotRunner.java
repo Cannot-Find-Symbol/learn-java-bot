@@ -7,11 +7,12 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import org.learn_java.bot.commands.SlashCommand;
+import org.learn_java.bot.commands.user.SlashCommand;
 import org.learn_java.bot.configuration.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
@@ -27,6 +28,7 @@ public class BotRunner implements CommandLineRunner {
     private final ListenerAdapter[] listeners;
     private final Config config;
     private final SlashCommand[] slashCommands;
+    ApplicationContext context;
 
     public BotRunner(Command[] commands, ListenerAdapter[] listeners, SlashCommand[] slashCommands, Config config) {
         this.commands = commands;

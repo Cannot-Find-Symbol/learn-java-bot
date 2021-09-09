@@ -1,4 +1,6 @@
-package org.learn_java.bot.event.listeners.run_listener;
+package org.learn_java.ekmc.model;
+
+import org.learn_java.ekmc.model.Run;
 
 public class RunResponse {
     String language;

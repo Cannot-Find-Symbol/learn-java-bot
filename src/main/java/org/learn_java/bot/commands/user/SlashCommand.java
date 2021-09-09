@@ -1,4 +1,4 @@
-package org.learn_java.bot.commands;
+package org.learn_java.bot.commands.user;
 
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;

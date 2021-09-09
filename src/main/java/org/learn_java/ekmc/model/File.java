@@ -1,13 +1,13 @@
-package org.learn_java.bot.event.listeners.run_listener;
+package org.learn_java.ekmc.model;
 
-public class Files {
+public class File {
     String content;
 
-    public Files(String content) {
+    public File(String content) {
         this.content = content;
     }
 
-    public Files() {
+    public File() {
     }
 
     public String getContent() {

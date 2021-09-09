@@ -3,6 +3,8 @@ discord.key=abcdefjijklmnopqrstuvwxyz
 bot.prefix=!
 bot.ownerid=123456789
 
+help.channelids=1
+
 #listeners
 autofree.enabled=true
 codeblocks.enabled=true

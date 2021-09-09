@@ -1,4 +1,4 @@
-package org.learn_java.bot.event.listeners.run_listener;
+package org.learn_java.ekmc.model;
 
 public class Run {
     String stdout;
