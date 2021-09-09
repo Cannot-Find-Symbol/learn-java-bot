@@ -4,7 +4,6 @@ package org.learn_java.bot.commands.user.run;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -12,7 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.learn_java.bot.BotRunner;
 import org.learn_java.bot.commands.user.SlashCommand;
 import org.learn_java.ekmc.PistonService;
 import org.learn_java.ekmc.model.Language;
@@ -49,6 +47,15 @@ public class Run implements SlashCommand {
     private static final String LANGUAGE_IS_INVALID = "Sorry, can't run this code. No language provided or language is invalid";
     private static final Logger logger = LoggerFactory.getLogger(Run.class);
 
+    private static final String COMMON_IMPORTS =
+            """
+                    import java.util.*;
+                    import java.io.*;
+                    import java.time.*;
+                    import java.math.*;
+                                
+                    """;
+
 
     public Run(PistonService pistonService) {
         this.name = "run";
@@ -64,7 +71,7 @@ public class Run implements SlashCommand {
 
     @Override
     public void executeSlash(SlashCommandEvent event) {
-        event.deferReply(true).queue();
+        event.deferReply().queue();
         updateLanguages();
         event.getOptions().forEach(mapping -> {
             switch (mapping.getName()) {
@@ -100,41 +107,48 @@ public class Run implements SlashCommand {
         Matcher matcher = pattern.matcher(link);
         if (matcher.find()) {
             String id = matcher.group(1);
-            event.getChannel().retrieveMessageById(id).queue(this::sendResponseToChannel);
+            event.getChannel().retrieveMessageById(id).queue(message -> sendResponseToChannel(message, event));
         }
     }
 
     private void handleExecuteFromId(SlashCommandEvent event, String id) {
-        event.getChannel().retrieveMessageById(id).queue(this::sendResponseToChannel);
+        event.getChannel().retrieveMessageById(id).queue(message -> sendResponseToChannel(message, event));
     }
 
-    private void sendResponseToChannel(Message message) {
+    private void sendResponseToChannel(Message message, SlashCommandEvent event) {
         String lang = StringUtils.substringBetween(message.getContentRaw(), "```", "\n");
         String code = StringUtils.substringBetween(message.getContentRaw(), "```" + lang, "```");
 
         if (languageMap.containsKey(lang)) {
             Language language = languageMap.get(lang);
-            sendRequest(message, code, language);
+            sendRequest(message, code, language, event);
         } else {
-            message.getChannel().sendMessage(LANGUAGE_IS_INVALID).queue();
+            event.getHook().sendMessage(LANGUAGE_IS_INVALID).queue();
         }
     }
 
-    private void sendRequest(Message message, String code, Language language) {
-        RunRequest runRequest = new RunRequest(code, language);
+    private void sendRequest(Message message, String code, Language language, SlashCommandEvent event) {
+        RunRequest runRequest = new RunRequest(addCommonImports(code, language), language);
         pistonService.execute(runRequest).enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<RunResponse> call, Response<RunResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    message.getTextChannel().sendMessageEmbeds(buildResponse(language, message, response.body())).queue();
+                    event.getHook().sendMessageEmbeds(buildResponse(language, message, response.body())).queue();
                 }
             }
 
             @Override
             public void onFailure(Call<RunResponse> call, Throwable throwable) {
-                message.getTextChannel().sendMessage("Sorry, it seemst he run API is currently down or something broke.").queue();
+                event.getHook().sendMessage("Sorry, it seemst he run API is currently down or something broke.").queue();
             }
         });
+    }
+
+    private String addCommonImports(String code, Language language) {
+        if (language.getLanguage().equalsIgnoreCase("java")) {
+            return COMMON_IMPORTS + code;
+        }
+        return code;
     }
 
     private MessageEmbed buildResponse(Language language, Message message, RunResponse r) {
