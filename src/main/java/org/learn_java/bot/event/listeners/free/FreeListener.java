@@ -2,10 +2,15 @@ package org.learn_java.bot.event.listeners.free;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+import org.learn_java.bot.commands.user.run.Run;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,11 +19,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.function.Consumer;
 
 @Component
 @ConditionalOnProperty(value = "autofree.enabled", havingValue = "true", matchIfMissing = true)
@@ -28,6 +30,7 @@ public class FreeListener extends ListenerAdapter {
     private final String availableCategoryId;
     private final String takenCategoryId;
     private JDA jda;
+    private static final Logger logger = LoggerFactory.getLogger(FreeListener.class);
 
 
     public FreeListener(@Value("${free.hours:3}") int hours,
@@ -47,7 +50,7 @@ public class FreeListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        if(event.getAuthor().isBot()) {
+        if (event.getAuthor().isBot()) {
             return;
         }
         moveChannel(event.getChannel(), takenCategoryId);
@@ -62,20 +65,30 @@ public class FreeListener extends ListenerAdapter {
         channel.getManager().setParent(category).queue();
     }
 
-    @Scheduled(cron = "* 0/15 * * * ?")
+    @Scheduled(cron = "* */15 * * * *")
     public void freeChannels() {
-        List<TextChannel> helpChannels = helpChannelIds.stream().map(jda::getTextChannelById).collect(Collectors.toList());
-        helpChannels.forEach((channel) -> {
-            if(channel.hasLatestMessage()) {
-                String latestMessageId = channel.getLatestMessageId();
-                channel.retrieveMessageById(latestMessageId).queue(e -> {
-                    OffsetDateTime lastMessage = e.getTimeCreated();
-                    OffsetDateTime limit = OffsetDateTime.now(lastMessage.getOffset()).minus(Duration.ofHours(hours));
-                    if (lastMessage.isBefore(limit)) {
-                        moveChannel(channel, availableCategoryId);
-                    }
-                });
-            }
-        });
+        if (jda == null) return;
+
+        helpChannelIds.stream().map(jda::getTextChannelById)
+                .filter(Objects::nonNull)
+                .forEach((channel) -> channel.getHistory().retrievePast(5)
+                        .queue(handleResponse(channel)));
+    }
+
+    private Consumer<List<Message>> handleResponse(TextChannel channel) {
+        return messages -> messages.stream()
+                .filter(this::isFromUser).findFirst().ifPresent(message -> freeIfPastLimit(channel, message));
+    }
+
+    private boolean isFromUser(Message message) {
+        return !message.getAuthor().isBot();
+    }
+
+    private void freeIfPastLimit(TextChannel channel, Message message) {
+        OffsetDateTime lastMessage = message.getTimeCreated();
+        OffsetDateTime limit = OffsetDateTime.now(lastMessage.getOffset()).minus(Duration.ofSeconds(20));
+        if (lastMessage.isBefore(limit)) {
+            moveChannel(channel, availableCategoryId);
+        }
     }
 }

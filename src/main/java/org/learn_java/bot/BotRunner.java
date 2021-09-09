@@ -28,7 +28,6 @@ public class BotRunner implements CommandLineRunner {
     private final ListenerAdapter[] listeners;
     private final Config config;
     private final SlashCommand[] slashCommands;
-    ApplicationContext context;
 
     public BotRunner(Command[] commands, ListenerAdapter[] listeners, SlashCommand[] slashCommands, Config config) {
         this.commands = commands;

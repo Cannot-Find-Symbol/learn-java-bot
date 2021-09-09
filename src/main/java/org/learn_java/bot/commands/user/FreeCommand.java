@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @ConditionalOnProperty(value = "free.enabled", havingValue = "true", matchIfMissing = true)
@@ -49,10 +48,9 @@ public class FreeCommand extends Command implements SlashCommand {
 
     @Override
     public void executeSlash(SlashCommandEvent event) {
-        boolean success = run(event.getTextChannel());
-        String msg = success ? "Success" : "Unable to free";
-        event.reply(msg)
-                .queue((s) -> s.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
+        event.deferReply(true).queue();
+        String response = run(event.getTextChannel()) ? "Success" : "Unable to free";
+        event.getHook().sendMessage(response).queue();
     }
 
     @Override
