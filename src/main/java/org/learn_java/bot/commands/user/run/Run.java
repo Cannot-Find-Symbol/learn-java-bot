@@ -146,9 +146,21 @@ public class Run implements SlashCommand {
 
     private String addCommonImports(String code, Language language) {
         if (language.getLanguage().equalsIgnoreCase("java")) {
-            return COMMON_IMPORTS + code;
+            return COMMON_IMPORTS + addClass(code);
         }
         return code;
+    }
+
+    private String addClass(String code) {
+        if(code.contains("class")) return code;
+        return "class Example {" + addMainMethod(code) + "};";
+    }
+
+    private String addMainMethod(String code) {
+        if(code.contains("public static void main")) return code;
+        return """
+                public static void main(String[] args) {
+                """ + code + "};";
     }
 
     private MessageEmbed buildResponse(Language language, Message message, RunResponse r) {
