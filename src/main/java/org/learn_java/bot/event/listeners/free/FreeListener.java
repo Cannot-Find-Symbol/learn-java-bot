@@ -86,7 +86,7 @@ public class FreeListener extends ListenerAdapter {
 
     private void freeIfPastLimit(TextChannel channel, Message message) {
         OffsetDateTime lastMessage = message.getTimeCreated();
-        OffsetDateTime limit = OffsetDateTime.now(lastMessage.getOffset()).minus(Duration.ofSeconds(20));
+        OffsetDateTime limit = OffsetDateTime.now(lastMessage.getOffset()).minus(Duration.ofHours(hours));
         if (lastMessage.isBefore(limit)) {
             moveChannel(channel, availableCategoryId);
         }
