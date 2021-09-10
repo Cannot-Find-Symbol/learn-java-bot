@@ -77,7 +77,7 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     public List<Member> filterMemberList(List<Message> messages, GuildMessageReceivedEvent event) {
-        return messages.stream().peek(System.out::println)
+        return messages.stream()
                 .map(Message::getMember)
                 .filter(Objects::nonNull)
                 .filter(this::isNotBot)
