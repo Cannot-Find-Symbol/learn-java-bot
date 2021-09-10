@@ -28,6 +28,7 @@ public class ThanksListener extends ListenerAdapter {
 
     private MemberInfoService service;
     private Map<Long, LocalDateTime> recentlyUsedByMembers;
+    private Map<Long, Long> selectionMenuForMembers;
 
     public ThanksListener(MemberInfoService service) {
         this.service = service;
@@ -47,8 +48,9 @@ public class ThanksListener extends ListenerAdapter {
             List<SelectOption> options = createMemberSelectOptions(members);
             SelectOption dismiss = SelectOption.of("Nobody", "dismiss").withDescription("Select to dismiss this message");
             options.add(dismiss);
-            SelectionMenu menu = SelectionMenu.create("thanks").addOptions(options).setPlaceholder("Member").build();
-            event.getChannel().sendMessage("It looks like you've thanked someone, who helped you?").setActionRow(menu).queue();
+            SelectionMenu menu = SelectionMenu.create("thanks" + ":" + event.getMember().getId()).addOptions(options).setPlaceholder("Member").build();
+            event.getChannel().sendMessage("It looks like you've thanked someone, who helped you?").setActionRow(menu)
+                    .queue();
         }
     }
 
@@ -93,9 +95,11 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     public void onSelectionMenu(@Nonnull SelectionMenuEvent event) {
+        String menuId = event.getComponentId();
+        String memberId = event.getComponentId().split(":")[1];
         if (event.getValues().contains("dismiss")) {
             event.getMessage().delete().queue();
-        } else if (event.getComponentId().startsWith("thanks")) {
+        } else if (menuId.startsWith("thanks") && event.getMember().getId().equals(memberId)) {
             String id = event.getValues().get(0);
             if (event.isFromGuild()) {
                 recentlyUsedByMembers.put(Objects.requireNonNull(event.getMember()).getIdLong(), LocalDateTime.now());
