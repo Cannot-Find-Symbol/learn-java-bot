@@ -6,10 +6,12 @@ import net.dv8tion.jda.api.entities.Message;
 
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.service.MemberInfoService;
@@ -21,6 +23,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
@@ -28,7 +32,9 @@ public class ThanksListener extends ListenerAdapter {
 
     private MemberInfoService service;
     private Map<Long, LocalDateTime> recentlyUsedByMembers;
-    private Map<Long, Long> selectionMenuForMembers;
+
+    private static final ErrorHandler errorHandler = new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE);
+
 
     public ThanksListener(MemberInfoService service) {
         this.service = service;
@@ -49,9 +55,16 @@ public class ThanksListener extends ListenerAdapter {
             SelectOption dismiss = SelectOption.of("Nobody", "dismiss").withDescription("Select to dismiss this message");
             options.add(dismiss);
             SelectionMenu menu = SelectionMenu.create("thanks" + ":" + event.getMember().getId()).addOptions(options).setPlaceholder("Member").build();
-            event.getChannel().sendMessage("It looks like you've thanked someone, who helped you?").setActionRow(menu)
-                    .queue();
+            event.getChannel().sendMessage("It looks like you've thanked someone, who helped you?")
+                    .setActionRow(menu)
+                    .queue(messageSentHandler(event));
         }
+    }
+
+    @NotNull
+    private Consumer<Message> messageSentHandler(@NotNull GuildMessageReceivedEvent event) {
+        return sentMessage -> event.getChannel().retrieveMessageById(sentMessage.getId())
+                .queueAfter(1, TimeUnit.MINUTES, (updatedMessage) -> updatedMessage.delete().setCheck(() -> !updatedMessage.isEdited()).queue(), errorHandler);
     }
 
     private boolean containsThanks(@NotNull GuildMessageReceivedEvent event) {
@@ -97,18 +110,22 @@ public class ThanksListener extends ListenerAdapter {
     public void onSelectionMenu(@Nonnull SelectionMenuEvent event) {
         String menuId = event.getComponentId();
         String memberId = event.getComponentId().split(":")[1];
+        if (!event.getMember().getId().equals(memberId)) {
+            event.reply("This interaction was not for you :) Sorry").setEphemeral(true).queue();
+            return;
+        }
         if (event.getValues().contains("dismiss")) {
             event.getMessage().delete().queue();
-        } else if (menuId.startsWith("thanks") && event.getMember().getId().equals(memberId)) {
+        } else if (menuId.startsWith("thanks")) {
             String id = event.getValues().get(0);
             if (event.isFromGuild()) {
+                event.deferEdit().queue();
                 recentlyUsedByMembers.put(Objects.requireNonNull(event.getMember()).getIdLong(), LocalDateTime.now());
                 event.getGuild().retrieveMemberById(id).queue((member) -> {
                     MemberInfo info = service.updateThankCountForMember(member.getIdLong());
-                    event.getChannel().sendMessage(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)").queue();
+                    event.getHook().editOriginal(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)").setActionRows(Collections.emptyList()).queue(null, errorHandler);
                 });
             }
-            event.getMessage().delete().queue();
         }
     }
 
