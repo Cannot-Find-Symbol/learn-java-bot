@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.learn_java.bot.commands.user.SlashCommand;
+import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.ekmc.PistonService;
 import org.learn_java.ekmc.model.Language;
 import org.learn_java.ekmc.model.RunRequest;

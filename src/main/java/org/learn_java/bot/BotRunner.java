@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.learn_java.bot.commands.user.SlashCommand;
+import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.bot.configuration.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

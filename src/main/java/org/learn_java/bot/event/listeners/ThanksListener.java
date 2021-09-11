@@ -109,25 +109,29 @@ public class ThanksListener extends ListenerAdapter {
 
     public void onSelectionMenu(@Nonnull SelectionMenuEvent event) {
         String menuId = event.getComponentId();
+        if (!menuId.startsWith("thanks")) return;
         String memberId = event.getComponentId().split(":")[1];
         if (!event.getMember().getId().equals(memberId)) {
             event.reply("This interaction was not for you :) Sorry").setEphemeral(true).queue();
             return;
         }
+
         if (event.getValues().contains("dismiss")) {
             event.getMessage().delete().queue();
-        } else if (menuId.startsWith("thanks")) {
-            String id = event.getValues().get(0);
-            if (event.isFromGuild()) {
-                event.deferEdit().queue();
-                recentlyUsedByMembers.put(Objects.requireNonNull(event.getMember()).getIdLong(), LocalDateTime.now());
-                event.getGuild().retrieveMemberById(id).queue((member) -> {
-                    MemberInfo info = service.updateThankCountForMember(member.getIdLong());
-                    event.getHook().editOriginal(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)").setActionRows(Collections.emptyList()).queue(null, errorHandler);
-                });
-            }
+            return;
+        }
+
+        String id = event.getValues().get(0);
+        if (event.isFromGuild()) {
+            event.deferEdit().queue();
+            recentlyUsedByMembers.put(Objects.requireNonNull(event.getMember()).getIdLong(), LocalDateTime.now());
+            event.getGuild().retrieveMemberById(id).queue((member) -> {
+                MemberInfo info = service.updateThankCountForMember(member.getIdLong());
+                event.getHook().editOriginal(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)").setActionRows(Collections.emptyList()).queue(null, errorHandler);
+            });
         }
     }
+
 
     @Scheduled(cron = "* */15 * * * *")
     public void purgeCache() {

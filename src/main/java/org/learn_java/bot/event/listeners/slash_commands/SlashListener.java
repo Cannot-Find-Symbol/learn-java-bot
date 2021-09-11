@@ -2,7 +2,7 @@ package org.learn_java.bot.event.listeners.slash_commands;
 
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.learn_java.bot.commands.user.SlashCommand;
+import org.learn_java.bot.commands.SlashCommand;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
