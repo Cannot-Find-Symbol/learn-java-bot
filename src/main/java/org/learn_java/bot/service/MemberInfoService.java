@@ -5,6 +5,9 @@ import org.learn_java.bot.data.repositories.MemberInfoRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,5 +28,13 @@ public class MemberInfoService {
         info.setMonthThankCount(info.getMonthThankCount() + 1);
         info.setTotalThankCount(info.getTotalThankCount() + 1);
         return info;
+    }
+
+    public List<MemberInfo> findTop10ForMonth() {
+        return repository.findAll().stream().sorted(Comparator.comparing(MemberInfo::getMonthThankCount)).limit(10).collect(Collectors.toList());
+    }
+
+    public List<MemberInfo> findTop10AllTime() {
+        return repository.findAll().stream().sorted(Comparator.comparing(MemberInfo::getTotalThankCount)).limit(10).collect(Collectors.toList());
     }
 }
