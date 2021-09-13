@@ -10,6 +10,9 @@ import org.learn_java.bot.commands.SlashCommand;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.function.Function;
+
 @Component
 @ConditionalOnProperty(value = "code.enabled", havingValue = "true", matchIfMissing = true)
 public class CodeCommand extends Command implements SlashCommand {

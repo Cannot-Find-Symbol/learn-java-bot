@@ -1,6 +1,8 @@
 package org.learn_java.bot.event.listeners;
 
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -16,38 +18,33 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class RoleListener extends ListenerAdapter {
-    private String roleChannelId;
-    private String guildId;
+public class RoleListener extends ListenerAdapter implements Startup {
     private RoleGroupService service;
+    private JDA jda;
 
-    public RoleListener(@Value("${role.channelid}") String roleChannelId, @Value("${guild.id}") String guildId, RoleGroupService service) {
-        this.roleChannelId = roleChannelId;
-        this.guildId = guildId;
+    public RoleListener(RoleGroupService service, JDA jda) {
         this.service = service;
+        this.jda = jda;
     }
 
-    public void onReady(@Nonnull ReadyEvent event) {
-        TextChannel roleChannel = Objects.requireNonNull(event.getJDA().getGuildById(guildId)).getTextChannelById(roleChannelId);
-        // TODO this is really bad, fix it
-        roleChannel.getIterableHistory().forEach(message -> message.delete().queue());
-        List<Role> roles = event.getJDA().getGuildById(guildId).getRoles();
-        List<RoleGroup> groups = service.findAll();
-        groups.forEach(group -> {
-            SelectionMenu.Builder menuBuilder = SelectionMenu.create("rolegroup" + ":" + group.getId());
-            Map<Long, Role> discordRoles = findGroupRoles(group, roles);
+    private Message createRoleMessage(List<Role> roles, RoleGroup group) {
+        MessageBuilder builder = new MessageBuilder();
+        SelectionMenu.Builder menuBuilder = SelectionMenu.create("rolegroup" + ":" + group.getId());
+        Map<Long, Role> discordRoles = findGroupRoles(group, roles);
 
-            List<MemberRole> memberRoles = group.getRoles().stream().sorted(Comparator.comparing(MemberRole::getOrdinal)).collect(Collectors.toList());
-            memberRoles.forEach(role -> {
-                Role discordRole = discordRoles.get(role.getId());
-                menuBuilder.addOption(discordRole.getName(), discordRole.getId(), role.getDescription());
-            });
-            roleChannel.sendMessage("Select a role").setActionRows(ActionRow.of(menuBuilder.build())).queue();
+        List<MemberRole> memberRoles = group.getRoles().stream().sorted(Comparator.comparing(MemberRole::getOrdinal)).collect(Collectors.toList());
+        memberRoles.forEach(role -> {
+            Role discordRole = discordRoles.get(role.getId());
+            menuBuilder.addOption(discordRole.getName(), discordRole.getId(), role.getDescription());
         });
+        builder.setContent(group.getMessage() == null ? "test" : group.getMessage());
+        builder.setActionRows(ActionRow.of(menuBuilder.build()));
+        return builder.build();
     }
 
     private Map<Long, Role> findGroupRoles(RoleGroup group, List<Role> roles) {
@@ -81,5 +78,29 @@ public class RoleListener extends ListenerAdapter {
         event.getGuild().modifyMemberRoles(event.getInteraction().getMember(), Collections.singletonList(role), roles).queue(succuess -> {
             event.getHook().sendMessage("Your role has been set").queue();
         });
+    }
+
+    @Override
+    public void startup() {
+        List<RoleGroup> groups = service.findAll();
+        groups.forEach(group -> {
+            List<Role> roles = jda.getGuildById(group.getGuildId()).getRoles();
+            TextChannel roleChannel = jda.getGuildById(group.getGuildId()).getTextChannelById(group.getChannelId());
+            Message message = createRoleMessage(roles, group);
+            if (group.getMessageId() == null) {
+                roleChannel.sendMessage(message).queue((success) -> updateMessageInformation(success.getIdLong(), group));
+            } else {
+                roleChannel.retrieveMessageById(group.getMessageId()).queue((succuess) -> {
+                    succuess.editMessage(message).queue(null, (fail) -> {
+                        roleChannel.sendMessage(message).queue();
+                    });
+                });
+            }
+        });
+    }
+
+    public void updateMessageInformation(long messageId, RoleGroup group) {
+        group.setMessageId(messageId);
+        service.save(group);
     }
 }

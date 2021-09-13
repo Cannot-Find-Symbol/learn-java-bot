@@ -11,7 +11,7 @@ public class MemberRole {
 
     private int ordinal;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     RoleGroup group;
 
 

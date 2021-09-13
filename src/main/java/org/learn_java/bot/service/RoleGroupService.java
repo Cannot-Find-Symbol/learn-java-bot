@@ -22,4 +22,8 @@ public class RoleGroupService {
     public RoleGroup findById(Long id) {
         return repository.findById(id).orElse(null);
     }
+
+    public RoleGroup save(RoleGroup group) {
+        return repository.save(group);
+    }
 }

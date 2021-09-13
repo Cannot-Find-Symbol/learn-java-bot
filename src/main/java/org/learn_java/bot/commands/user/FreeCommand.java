@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 @Component
 @ConditionalOnProperty(value = "free.enabled", havingValue = "true", matchIfMissing = true)

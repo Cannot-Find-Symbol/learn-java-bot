@@ -36,16 +36,13 @@ public class FreeListener extends ListenerAdapter {
     public FreeListener(@Value("${free.hours:3}") int hours,
                         @Value("${help.channelids}") String helpChannelIds,
                         @Value("${available.categoryid}") String availableCategoryId,
-                        @Value("${taken.categoryid}") String takenCategoryId) {
+                        @Value("${taken.categoryid}") String takenCategoryId,
+                        JDA jda) {
         this.hours = hours;
         this.helpChannelIds = new HashSet<>(Arrays.asList(helpChannelIds.split(",")));
         this.availableCategoryId = availableCategoryId;
         this.takenCategoryId = takenCategoryId;
-    }
-
-    @Override
-    public void onReady(@Nonnull ReadyEvent event) {
-        jda = event.getJDA();
+        this.jda = jda;
     }
 
     @Override
