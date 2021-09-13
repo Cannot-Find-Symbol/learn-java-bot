@@ -39,6 +39,7 @@ public class AddRole implements SlashCommand {
         createGroup.addOption(OptionType.CHANNEL, "channel", "channel id", true);
         createGroup.addOption(OptionType.BOOLEAN, "unique", "unique", false);
         createGroup.addOption(OptionType.STRING, "name", "group name", false);
+        createGroup.addOption(OptionType.STRING, "message", "Message to be sent", false);
 
         commandData.addSubcommands(view, add, createGroup);
         commandData.setDefaultEnabled(false);
@@ -90,6 +91,8 @@ public class AddRole implements SlashCommand {
             group.setChannelId(channel.getIdLong());
             OptionMapping name = event.getOption("name");
             group.setName(name == null ? "" : name.getAsString());
+            OptionMapping message = event.getOption("message");
+            group.setMessage(message == null ? "" : message.getAsString());
             RoleGroup saved = service.save(group);
             event.getHook().sendMessage("Guild created, id is " + saved.getId()).queue();
         }
