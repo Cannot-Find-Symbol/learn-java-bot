@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +29,14 @@ public class MemberInfoService {
         info.setMonthThankCount(info.getMonthThankCount() + 1);
         info.setTotalThankCount(info.getTotalThankCount() + 1);
         return info;
+    }
+
+    public int getMonthThankCountByMemberId(long id) {
+        Optional<MemberInfo> info =  repository.findById(id);
+        if(info.isPresent()) {
+            return info.get().getMonthThankCount();
+        }
+        return -1;
     }
 
     public List<MemberInfo> findTop10ForMonth() {

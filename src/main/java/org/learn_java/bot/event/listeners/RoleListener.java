@@ -37,13 +37,18 @@ public class RoleListener extends ListenerAdapter implements Startup {
         SelectionMenu.Builder menuBuilder = SelectionMenu.create("rolegroup" + ":" + group.getId());
         Map<Long, Role> discordRoles = findGroupRoles(group, roles);
 
-        List<MemberRole> memberRoles = group.getRoles().stream().sorted(Comparator.comparing(MemberRole::getOrdinal)).collect(Collectors.toList());
+        List<MemberRole> memberRoles = group.getRoles().stream()
+                .sorted(Comparator.comparing(MemberRole::getOrdinal))
+                .collect(Collectors.toList());
+
         memberRoles.forEach(role -> {
             Role discordRole = discordRoles.get(role.getId());
             menuBuilder.addOption(discordRole.getName(), discordRole.getId(), role.getDescription());
         });
+
         builder.setContent(group.getMessage() == null ? "test" : group.getMessage());
         builder.setActionRows(ActionRow.of(menuBuilder.build()));
+
         return builder.build();
     }
 
@@ -81,6 +86,7 @@ public class RoleListener extends ListenerAdapter implements Startup {
     }
 
     @Override
+    @Transactional
     public void startup() {
         List<RoleGroup> groups = service.findAll();
         groups.forEach(group -> {
@@ -90,11 +96,13 @@ public class RoleListener extends ListenerAdapter implements Startup {
             if (group.getMessageId() == null) {
                 roleChannel.sendMessage(message).queue((success) -> updateMessageInformation(success.getIdLong(), group));
             } else {
-                roleChannel.retrieveMessageById(group.getMessageId()).queue((succuess) -> {
-                    succuess.editMessage(message).queue(null, (fail) -> {
-                        roleChannel.sendMessage(message).queue();
-                    });
-                });
+                roleChannel.retrieveMessageById(group.getMessageId())
+                        .queue((succuess) -> succuess.editMessage(message).queue()
+                                ,(fail) -> roleChannel.sendMessage(message).queue(succ -> {
+                                    System.out.println("here");
+                                    group.setMessageId(succ.getIdLong());
+                                    service.save(group);
+                                }));
             }
         });
     }

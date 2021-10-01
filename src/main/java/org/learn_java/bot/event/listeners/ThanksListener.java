@@ -68,7 +68,8 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     private boolean containsThanks(@NotNull GuildMessageReceivedEvent event) {
-        return event.getMessage().getContentRaw().toLowerCase().contains("thanks");
+       String message = event.getMessage().getContentRaw().toLowerCase();
+        return message.contains("thanks") || message.contains("thank you");
     }
 
     private boolean recentlyUsed(GuildMessageReceivedEvent event) {

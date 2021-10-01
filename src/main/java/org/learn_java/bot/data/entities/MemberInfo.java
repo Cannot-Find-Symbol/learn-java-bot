@@ -20,6 +20,15 @@ public class MemberInfo {
         this.monthThankCount = monthThankCount;
     }
 
+    @Override
+    public String toString() {
+        return "MemberInfo{" +
+                "id=" + id +
+                ", totalThankCount=" + totalThankCount +
+                ", monthThankCount=" + monthThankCount +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }
