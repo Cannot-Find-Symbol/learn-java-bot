@@ -118,7 +118,7 @@ public class Leaderboard implements SlashCommand {
         return commandData;
     }
 
-    @Scheduled(cron = "0 0 8 1 * * ")
+    @Scheduled(cron = "0 0 18 1 * * ")
     public void resetLeaderboard() {
         List<MemberInfo> memberInfos = service.findTop10ForMonth();
         TextChannel leaderboardChannel = jda.getGuildById(guildId).getTextChannelById(leaderboardChannelId);
