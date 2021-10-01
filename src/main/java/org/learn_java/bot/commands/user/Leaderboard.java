@@ -6,10 +6,11 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.service.MemberInfoService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,7 +33,11 @@ public class Leaderboard implements SlashCommand {
     }
 
     private void sendLeaderboard(SlashCommandEvent event, List<MemberInfo> memberInfos) {
-        List<Long> top10Ids = memberInfos.stream().map(MemberInfo::getId).collect(Collectors.toList());
+        List<Long> top10Ids = memberInfos.stream()
+                .sorted(Comparator.comparing(MemberInfo::getMonthThankCount))
+                .map(MemberInfo::getId)
+                .collect(Collectors.toList());
+
         event.getGuild().retrieveMembersByIds(top10Ids).onSuccess((members) -> {
             int maxNameLength = members.stream().map(Member::getEffectiveName).mapToInt(String::length).max().orElse(-1);
             StringBuilder sb = new StringBuilder();
@@ -63,5 +68,10 @@ public class Leaderboard implements SlashCommand {
     @Override
     public CommandData getCommandData() {
         return commandData;
+    }
+
+    @Scheduled(cron = "0 0 8 1 * * *")
+    public void resetLeaderboard() {
+        service.resetForMonth();
     }
 }

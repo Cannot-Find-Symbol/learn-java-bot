@@ -34,6 +34,10 @@ public class MemberInfoService {
         return repository.findAll().stream().sorted(Comparator.comparing(MemberInfo::getMonthThankCount)).limit(10).collect(Collectors.toList());
     }
 
+    public void resetForMonth() {
+        repository.findAll().forEach(member -> member.setMonthThankCount(0));
+    }
+
     public List<MemberInfo> findTop10AllTime() {
         return repository.findAll().stream().sorted(Comparator.comparing(MemberInfo::getTotalThankCount)).limit(10).collect(Collectors.toList());
     }
