@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import org.apache.commons.lang3.StringUtils;
 import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.bot.commands.user.run.MemberInfoDTO;
 import org.learn_java.bot.configuration.Config;
@@ -14,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,7 +92,9 @@ public class Leaderboard implements SlashCommand {
 
             int maxNameLength = members.stream().map(Member::getEffectiveName).mapToInt(String::length).max().orElse(-1);
             StringBuilder sb = new StringBuilder();
-            sb.append("Leaderboard (Total/Month)\n\n");
+            LocalDate today = LocalDate.now().minusMonths(1);
+            String month = StringUtils.capitalize(today.getMonth().name().toLowerCase());
+            sb.append("Leaderboard " + month + " totals (Total/Month)\n\n");
             int listNumber = 1;
             for (MemberInfoDTO member : memberInfoDTOS) {
                 MemberInfo stats = getThankCount(memberInfos, member.getMember().getIdLong());
