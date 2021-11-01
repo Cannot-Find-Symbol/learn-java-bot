@@ -34,7 +34,7 @@ public class SpamListener extends ListenerAdapter {
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if (event.isWebhookMessage() || event.getMember() == null || event.getAuthor().isBot()) return;
-        String message = event.getMessage().getContentRaw();
+        String message = event.getMessage().getContentRaw().trim();
         Member member = event.getMember();
         TextChannel channel = event.getChannel();
 
