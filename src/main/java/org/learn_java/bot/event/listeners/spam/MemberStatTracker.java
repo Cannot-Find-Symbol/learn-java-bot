@@ -21,7 +21,7 @@ public class MemberStatTracker {
         this.userId = userId;
     }
 
-    public void trackMessage(String message, long channelId){
+    public void trackMessageOrFilename(String message, long channelId){
         if(!messageFrequencyTracker.containsKey(message) && !messageToChannelTracker.containsKey(message)) {
             uniqueConcurrentMessageCount++;
         }

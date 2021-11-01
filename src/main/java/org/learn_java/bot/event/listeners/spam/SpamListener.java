@@ -2,6 +2,7 @@ package org.learn_java.bot.event.listeners.spam;
 
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
@@ -33,16 +34,26 @@ public class SpamListener extends ListenerAdapter {
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if (event.isWebhookMessage() || event.getMember() == null || event.getAuthor().isBot()) return;
-        String message = event.getMessage().getContentRaw().trim();
+        String message = event.getMessage().getContentRaw();
         Member member = event.getMember();
         TextChannel channel = event.getChannel();
-        checkForRepeatedMessages(message, member, channel);
+
+        if(!message.isEmpty()) {
+            checkForRepeated(message, member, channel);
+        }
+
+        if(!event.getMessage().getAttachments().isEmpty()){
+            for(Message.Attachment attachment : event.getMessage().getAttachments()){
+                checkForRepeated(attachment.getFileName(), member, channel);
+            }
+        }
+
         checkIfMatchesSpam(event, message, event.getAuthor().getName());
     }
 
-    public void checkForRepeatedMessages(String message, Member member, TextChannel channel) {
+    public void checkForRepeated(String message, Member member, TextChannel channel) {
         MemberStatTracker tracker = trackers.computeIfAbsent(member.getUser().getIdLong(), MemberStatTracker::new);
-        tracker.trackMessage(message, channel.getIdLong());
+        tracker.trackMessageOrFilename(message, channel.getIdLong());
 
         if (tracker.isWarned() && tracker.messageIsInViolation(message)) {
             channel.sendMessage("BOOM heashot...").queue();
