@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.bot.commands.user.run.MemberInfoDTO;
 import org.learn_java.bot.configuration.Config;
@@ -50,7 +51,6 @@ public class Leaderboard implements SlashCommand {
 
     public void sendLeaderboardViaSlash(SlashCommandEvent event, List<MemberInfo> memberInfos) {
         List<Long> top10Ids = memberInfos.stream()
-                .sorted(Comparator.comparing(MemberInfo::getMonthThankCount))
                 .map(MemberInfo::getId)
                 .collect(Collectors.toList());
 
@@ -90,20 +90,30 @@ public class Leaderboard implements SlashCommand {
                     .sorted(Comparator.comparing(MemberInfoDTO::getThankCount).reversed())
                     .collect(Collectors.toList());
 
-            int maxNameLength = members.stream().map(Member::getEffectiveName).mapToInt(String::length).max().orElse(-1);
-            StringBuilder sb = new StringBuilder();
-            LocalDate today = LocalDate.now().minusMonths(1);
-            String month = StringUtils.capitalize(today.getMonth().name().toLowerCase());
-            sb.append("Leaderboard ").append(month).append(" totals (Total/Month)\n\n");
-            int listNumber = 1;
-            for (MemberInfoDTO member : memberInfoDTOS) {
-                MemberInfo stats = getThankCount(memberInfos, member.getMember().getIdLong());
-                sb.append(buildDescription(member.getMember().getEffectiveName(), stats, listNumber++, maxNameLength)).append("\n");
-            }
+            int maxNameLength = members.stream()
+                    .map(Member::getEffectiveName)
+                    .mapToInt(String::length)
+                    .max()
+                    .orElse(-1);
 
-            channel.sendMessage("```\n" + sb + "```").queue();
+            String leaderboard = buildLeaderBoard(memberInfos, memberInfoDTOS, maxNameLength);
+
+            channel.sendMessage("```\n" + leaderboard + "```").queue();
             service.resetForMonth();
         }));
+    }
+
+    private String buildLeaderBoard(List<MemberInfo> memberInfos, List<MemberInfoDTO> memberInfoDTOS, int maxNameLength) {
+        StringBuilder sb = new StringBuilder();
+        LocalDate today = LocalDate.now().minusMonths(1);
+        String month = StringUtils.capitalize(today.getMonth().name().toLowerCase());
+        sb.append("Leaderboard ").append(month).append(" totals (Total/Month)\n\n");
+        int listNumber = 1;
+        for (MemberInfoDTO member : memberInfoDTOS) {
+            MemberInfo stats = getThankCount(memberInfos, member.getMember().getIdLong());
+            sb.append(buildDescription(member.getMember().getEffectiveName(), stats, listNumber++, maxNameLength)).append("\n");
+        }
+        return sb.toString();
     }
 
     private String buildDescription(String name, MemberInfo stats, int position, int maxLength) {
@@ -124,7 +134,7 @@ public class Leaderboard implements SlashCommand {
         return commandData;
     }
 
-    @Scheduled(cron = "0/30 * * * * * ")
+    @Scheduled(cron = "0 0 18 1 * * ")
     public void resetLeaderboard() {
         List<MemberInfo> memberInfos = service.findTop10ForMonth();
         TextChannel leaderboardChannel = jda.getGuildById(guildId).getTextChannelById(leaderboardChannelId);
