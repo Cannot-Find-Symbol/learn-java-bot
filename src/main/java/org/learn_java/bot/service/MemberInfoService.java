@@ -39,6 +39,14 @@ public class MemberInfoService {
         return -1;
     }
 
+    public int getAllTimeThankCountByMemberId(long id) {
+        Optional<MemberInfo> info =  repository.findById(id);
+        if(info.isPresent()) {
+            return info.get().getTotalThankCount();
+        }
+        return -1;
+    }
+
     public List<MemberInfo> findTop10ForMonth() {
         return repository.findAll()
                 .stream()

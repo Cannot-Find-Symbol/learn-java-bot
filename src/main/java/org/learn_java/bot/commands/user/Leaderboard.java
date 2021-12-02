@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.learn_java.bot.commands.SlashCommand;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +38,9 @@ public class Leaderboard implements SlashCommand {
                        @Value("${leaderboard.channelid}") String leaderboardChannelId, JDA jda, Config config) {
         this.name = "leaderboard";
         this.commandData = new CommandData(name, "Show thanks leaderboard");
+        SubcommandData month = new SubcommandData("month", "view leaderboard for current month");
+        SubcommandData allTime = new SubcommandData("alltime", "view leaderboard for current month");
+        commandData.addSubcommands(month, allTime);
         this.service = service;
         this.leaderboardChannelId = leaderboardChannelId;
         this.jda = jda;
@@ -45,7 +50,12 @@ public class Leaderboard implements SlashCommand {
     @Override
     public void executeSlash(SlashCommandEvent event) {
         event.deferReply(false).queue();
-        List<MemberInfo> memberInfos = service.findTop10ForMonth();
+        List<MemberInfo> memberInfos = Collections.emptyList();
+        if(event.getSubcommandName().equals("alltime")) {
+             memberInfos = service.findTop10AllTime();
+        } else if(event.getSubcommandName().equals("month")){
+            memberInfos = service.findTop10ForMonth();
+        }
         sendLeaderboardViaSlash(event, memberInfos);
     }
 
@@ -58,22 +68,56 @@ public class Leaderboard implements SlashCommand {
 
             // TODO this is a crappy bandaid because I don't have time to fix sorting.... fix it...
             List<MemberInfoDTO> memberInfoDTOS =  members.stream()
-                    .map(member -> new MemberInfoDTO(member, service.getMonthThankCountByMemberId(member.getIdLong())))
+                    .map(member -> new MemberInfoDTO(member, getThankCount(member, event.getSubcommandName())))
                     .filter(dto -> dto.getThankCount() > 0)
                     .sorted(Comparator.comparing(MemberInfoDTO::getThankCount).reversed())
                     .collect(Collectors.toList());
 
             int maxNameLength = members.stream().map(Member::getEffectiveName).mapToInt(String::length).max().orElse(-1);
             StringBuilder sb = new StringBuilder();
-            sb.append("Leaderboard (Total/Month)\n\n");
+            sb.append(getTitle(event.getSubcommandName()));
             int listNumber = 1;
             for (MemberInfoDTO member : memberInfoDTOS) {
                 MemberInfo stats = getThankCount(memberInfos, member.getMember().getIdLong());
-                sb.append(buildDescription(member.getMember().getEffectiveName(), stats, listNumber++, maxNameLength)).append("\n");
+                int thankCount = getThankCount(event, stats);
+                sb.append(buildDescription(member.getMember().getEffectiveName(), thankCount, listNumber++, maxNameLength)).append("\n");
             }
 
             event.getHook().sendMessage("```\n" + sb + "```").queue();
         });
+    }
+
+    @NotNull
+    private String getTitle(String commandName) {
+        if(commandName.equals("alltime")) {
+            return "All Time Leaderboard\n\n";
+        } else if(commandName.equals("month")){
+            return "Current Month Leaderboard\n\n";
+        }
+        return "";
+    }
+
+    private int getThankCount(SlashCommandEvent event, MemberInfo stats) {
+        int thankCount = 0;
+        if(event.getSubcommandName().equals("alltime")) {
+            thankCount = stats.getTotalThankCount();
+        } else if(event.getSubcommandName().equals("month")){
+            thankCount = stats.getMonthThankCount();
+        }
+        return thankCount;
+    }
+
+    private int getThankCount(Member member, String command) {
+        if(command.equals("alltime")){
+            return service.getAllTimeThankCountByMemberId(member.getIdLong());
+        }
+
+        if(command.equals("month")){
+            return service.getMonthThankCountByMemberId(member.getIdLong());
+
+        }
+
+        return -1;
     }
 
     // TODO cleanup this duplicated code
@@ -87,7 +131,6 @@ public class Leaderboard implements SlashCommand {
           List<MemberInfoDTO> memberInfoDTOS =  members.stream()
                     .map(member -> new MemberInfoDTO(member, service.getMonthThankCountByMemberId(member.getIdLong())))
                     .filter(dto -> dto.getThankCount() > 0)
-                    .sorted(Comparator.comparing(MemberInfoDTO::getThankCount).reversed())
                     .collect(Collectors.toList());
 
             int maxNameLength = members.stream()
@@ -116,6 +159,10 @@ public class Leaderboard implements SlashCommand {
         return sb.toString();
     }
 
+    private String buildDescription(String name, int thankCount, int position, int maxLength) {
+        return String.format("%d. %-" + maxLength + "s\t%d", position, name, thankCount).replaceAll("\s", "\\ ");
+    }
+
     private String buildDescription(String name, MemberInfo stats, int position, int maxLength) {
         return String.format("%d. %-" + maxLength + "s\t%d/%d", position, name, stats.getTotalThankCount(), stats.getMonthThankCount()).replaceAll("\s", "\\ ");
     }
@@ -134,7 +181,7 @@ public class Leaderboard implements SlashCommand {
         return commandData;
     }
 
-    @Scheduled(cron = "0 0 18 1 * * ")
+    @Scheduled(cron = "0/30 * * * * * ")
     public void resetLeaderboard() {
         List<MemberInfo> memberInfos = service.findTop10ForMonth();
         TextChannel leaderboardChannel = jda.getGuildById(guildId).getTextChannelById(leaderboardChannelId);
