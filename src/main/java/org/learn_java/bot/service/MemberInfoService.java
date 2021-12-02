@@ -66,4 +66,8 @@ public class MemberInfoService {
                 .limit(10)
                 .collect(Collectors.toList());
     }
+
+    public MemberInfo findById(long id) {
+        return repository.findById(id).orElse(null);
+    }
 }
