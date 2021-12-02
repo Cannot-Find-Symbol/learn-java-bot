@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class MemberInfoService {
 
-    private MemberInfoRepository repository;
+    private final MemberInfoRepository repository;
 
     public MemberInfoService(MemberInfoRepository repository) {
         this.repository = repository;
@@ -40,7 +40,11 @@ public class MemberInfoService {
     }
 
     public List<MemberInfo> findTop10ForMonth() {
-        return repository.findAll().stream().sorted(Comparator.comparing(MemberInfo::getMonthThankCount)).limit(10).collect(Collectors.toList());
+        return repository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(MemberInfo::getMonthThankCount).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
     }
 
     public void resetForMonth() {
@@ -48,6 +52,10 @@ public class MemberInfoService {
     }
 
     public List<MemberInfo> findTop10AllTime() {
-        return repository.findAll().stream().sorted(Comparator.comparing(MemberInfo::getTotalThankCount)).limit(10).collect(Collectors.toList());
+        return repository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(MemberInfo::getTotalThankCount).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
     }
 }

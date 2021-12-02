@@ -94,7 +94,7 @@ public class Leaderboard implements SlashCommand {
             StringBuilder sb = new StringBuilder();
             LocalDate today = LocalDate.now().minusMonths(1);
             String month = StringUtils.capitalize(today.getMonth().name().toLowerCase());
-            sb.append("Leaderboard " + month + " totals (Total/Month)\n\n");
+            sb.append("Leaderboard ").append(month).append(" totals (Total/Month)\n\n");
             int listNumber = 1;
             for (MemberInfoDTO member : memberInfoDTOS) {
                 MemberInfo stats = getThankCount(memberInfos, member.getMember().getIdLong());
@@ -124,7 +124,7 @@ public class Leaderboard implements SlashCommand {
         return commandData;
     }
 
-    @Scheduled(cron = "0 0 18 1 * * ")
+    @Scheduled(cron = "0/30 * * * * * ")
     public void resetLeaderboard() {
         List<MemberInfo> memberInfos = service.findTop10ForMonth();
         TextChannel leaderboardChannel = jda.getGuildById(guildId).getTextChannelById(leaderboardChannelId);
