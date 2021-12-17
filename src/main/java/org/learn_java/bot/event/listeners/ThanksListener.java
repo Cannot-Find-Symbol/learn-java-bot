@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -100,12 +101,21 @@ public class ThanksListener extends ListenerAdapter {
 
     public List<Member> filterMemberList(List<Message> messages, GuildMessageReceivedEvent event) {
         return messages.stream()
+                .filter(this::isRecentMessage)
                 .map(Message::getMember)
                 .filter(Objects::nonNull)
                 .filter(this::isNotBot)
                 .filter(member -> isNotSelf(event, member))
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    private boolean isRecentMessage(Message message) {
+        return message.getTimeCreated().isAfter(calculateEarliestTime(message));
+    }
+
+    private OffsetDateTime calculateEarliestTime(Message message) {
+        return OffsetDateTime.now(message.getTimeCreated().getOffset()).minus(Duration.ofHours(1));
     }
 
     private boolean isNotBot(Member member) {
