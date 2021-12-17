@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.service.MemberInfoService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
 
@@ -30,27 +31,34 @@ import java.util.stream.Collectors;
 @org.springframework.stereotype.Component
 public class ThanksListener extends ListenerAdapter {
 
-    private MemberInfoService service;
-    private Map<Long, LocalDateTime> recentlyUsedByMembers;
+    private final MemberInfoService service;
+    private final Map<Long, LocalDateTime> recentlyUsedByMembers;
+    private final Set<String> blacklistedChannels;
 
     private static final ErrorHandler errorHandler = new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE);
 
 
-    public ThanksListener(MemberInfoService service) {
+    public ThanksListener(MemberInfoService service,
+                          @Value("${thanks.blacklisted.channels}") Set<String> blacklistedChannels) {
         this.service = service;
         this.recentlyUsedByMembers = Collections.synchronizedMap(new HashMap<>());
+        this.blacklistedChannels = blacklistedChannels;
     }
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot() || event.getMember() == null || !containsThanks(event) || recentlyUsed(event)) {
+        if (shouldIgnoreThank(event)) {
             return;
         }
         getRecentlyTalkedMembers(event).thenAccept(members -> sendMemberList(event, members));
     }
 
+    private boolean shouldIgnoreThank(@NotNull GuildMessageReceivedEvent event) {
+        return event.getAuthor().isBot() || event.getMember() == null || blacklistedChannels.contains(event.getChannel().getId()) || !containsThanks(event) || recentlyUsed(event);
+    }
+
     private void sendMemberList(@NotNull GuildMessageReceivedEvent event, List<Member> members) {
-        if (!members.isEmpty()) {
+        if (!members.isEmpty() && event.getMember() != null) {
             List<SelectOption> options = createMemberSelectOptions(members);
             SelectOption dismiss = SelectOption.of("Nobody", "dismiss").withDescription("Select to dismiss this message");
             options.add(dismiss);
