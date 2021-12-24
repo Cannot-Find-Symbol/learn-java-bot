@@ -74,10 +74,8 @@ public class BotConfiguration {
     }
 
     private void enableForModerators(Config config, net.dv8tion.jda.api.interactions.commands.Command command, Guild guild) {
-        config.getModeratorRoleIds().forEach(roleId -> {
-            CommandPrivilege privilege = CommandPrivilege.enableRole(roleId);
-            command.updatePrivileges(guild, privilege).queue();
-        });
+        List<CommandPrivilege> rolePrivileges = config.getModeratorRoleIds().stream().map(CommandPrivilege::enableRole).collect(Collectors.toList());
+        command.updatePrivileges(guild, rolePrivileges).queue();
     }
 
     @NotNull
