@@ -20,7 +20,7 @@ public class BotInitializer {
 
     private final Config config;
 
-    public BotInitializer(Command[] commands, Config config) {
+    public BotInitializer(Config config) {
         this.config = config;
     }
 
