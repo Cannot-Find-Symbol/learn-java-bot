@@ -49,8 +49,7 @@ public class BotConfiguration {
         jda.addEventListener((Object[]) listeners);
         jda.addEventListener(client);
         startups.forEach(Startup::startup);
-        Objects.requireNonNull(jda.getGuildById(config.getGuildId())).updateCommands().addCommands(slash).queue();
-        enablePrivilegedSlashCommands();
+        Objects.requireNonNull(jda.getGuildById(config.getGuildId())).updateCommands().addCommands(slash).queue((s) -> enablePrivilegedSlashCommands());
     }
 
     private void enablePrivilegedSlashCommands() {
