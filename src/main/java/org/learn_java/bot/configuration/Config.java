@@ -3,6 +3,8 @@ package org.learn_java.bot.configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class Config {
 
@@ -17,6 +19,9 @@ public class Config {
 
     @Value("${guild.id}")
     private String guildId;
+
+    @Value("${moderator.roleids}")
+    private List<String> moderatorRoleIds;
 
     public Config() {
     }
@@ -35,5 +40,9 @@ public class Config {
 
     public String getGuildId() {
         return guildId;
+    }
+
+    public List<String> getModeratorRoleIds() {
+        return moderatorRoleIds;
     }
 }

@@ -10,4 +10,8 @@ public interface SlashCommand {
      void executeSlash(SlashCommandEvent event);
      String getName();
      CommandData getCommandData();
+
+     default CommandType getType() {
+          return CommandType.ANY;
+     }
 }
