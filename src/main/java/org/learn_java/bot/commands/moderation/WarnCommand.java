@@ -57,9 +57,9 @@ public class WarnCommand extends Command {
     @Override
     public void executeSlash(SlashCommandEvent event) {
         event.deferReply(true).queue();
-        String subcommandName = event.getSubcommandName();
+        String subcommandName = Objects.requireNonNull(event.getSubcommandName());
         User user = Objects.requireNonNull(event.getOption("member")).getAsUser();
-        switch (Objects.requireNonNull(subcommandName)) {
+        switch (subcommandName) {
             case "show" -> handleShow(user.getAsTag(), event.getTextChannel());
             case "add" -> handleAdd(event, user);
         }
@@ -68,6 +68,7 @@ public class WarnCommand extends Command {
     private void handleAdd(SlashCommandEvent event, User user) {
         String reason = Objects.requireNonNull(event.getOption("reason")).getAsString();
         service.save(createWarn(user, reason));
+        event.getHook().sendMessage("warn added").queue();
     }
 
     @Override

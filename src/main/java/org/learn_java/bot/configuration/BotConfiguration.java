@@ -22,16 +22,20 @@ import java.util.stream.Collectors;
 public class BotConfiguration {
     private final JDA jda;
     private final List<Command> commands;
+    private final ListenerAdapter[] listeners;
+    private final List<Startup> startups;
     private final Config config;
 
-    public BotConfiguration(JDA jda,List<Command> commands, Config config) {
+    public BotConfiguration(JDA jda,List<Command> commands, ListenerAdapter[] listeners, List<Startup> startups, Config config) {
         this.jda = jda;
         this.commands = commands;
+        this.listeners = listeners;
+        this.startups = startups;
         this.config = config;
     }
 
     @PostConstruct
-    public void configure(ListenerAdapter[] listeners, List<Startup> startups) {
+    public void configure() {
         CommandData[] slash = commands.stream().map(SlashCommand::getCommandData).toArray(CommandData[]::new);
         jda.addEventListener((Object[]) listeners);
         startups.forEach(Startup::startup);
