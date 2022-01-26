@@ -1,10 +1,13 @@
+/*
 package org.learn_java.bot.commands.user;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import org.learn_java.bot.commands.Command;
+import org.learn_java.bot.commands.CommandType;
 import org.learn_java.bot.data.dtos.InfoDTO;
 import org.learn_java.bot.data.entities.Info;
 import org.learn_java.bot.service.InfoService;
@@ -25,42 +28,8 @@ public class InfoCommand extends Command {
     private final List<String> commandsRequiringPermission = Arrays.asList("add", "update", "delete");
 
     public InfoCommand(InfoService service, @Value("${info.cooldown:5}") int cooldown) {
+        super("info", CommandType.ROLE);
         this.service = service;
-        this.name = "info";
-        this.help = "";
-        this.cooldown = cooldown;
-    }
-
-    @Override
-    protected void execute(CommandEvent event) {
-        String[] args = event.getArgs().split("\\s+", 3);
-
-        if(event.getArgs().isBlank()){
-            handleShowTopics(event);
-            return;
-        }
-
-        String command = args[0];
-
-        if (!validCommands.contains(command)) {
-            service.findById(command).ifPresentOrElse(
-                    topic -> event.reply(topic.getMessage()),
-                    () -> event.reply("Sorry, couldn't find a topic by that name"));
-
-            return;
-        }
-
-
-        if (!hasPermission(command, event)) {
-            event.reply("Sorry, you don't have permission for that");
-            return;
-        }
-
-        switch (command) {
-            case "add" -> handleAdd(args, event);
-            case "delete" -> handleDelete(args, event);
-            case "update" -> handleUpdate(args, event);
-        }
     }
 
     public boolean hasPermission(String command, CommandEvent event) {
@@ -136,4 +105,42 @@ public class InfoCommand extends Command {
     private String buildTopicLine(int listNumber, String topic) {
         return String.format("%4s %s%n", listNumber + ". ", topic);
     }
+
+    @Override
+    public void executeSlash(SlashCommandEvent event) {
+        String[] args = event.getArgs().split("\\s+", 3);
+
+        if(event.getArgs().isBlank()){
+            handleShowTopics(event);
+            return;
+        }
+
+        String command = args[0];
+
+        if (!validCommands.contains(command)) {
+            service.findById(command).ifPresentOrElse(
+                    topic -> event.reply(topic.getMessage()),
+                    () -> event.reply("Sorry, couldn't find a topic by that name"));
+
+            return;
+        }
+
+
+        if (!hasPermission(command, event)) {
+            event.reply("Sorry, you don't have permission for that");
+            return;
+        }
+
+        switch (command) {
+            case "add" -> handleAdd(args, event);
+            case "delete" -> handleDelete(args, event);
+            case "update" -> handleUpdate(args, event);
+        }
+    }
+
+    @Override
+    public CommandData getCommandData() {
+        return null;
+    }
 }
+*/

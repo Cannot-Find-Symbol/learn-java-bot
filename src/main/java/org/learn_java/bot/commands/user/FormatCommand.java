@@ -1,7 +1,8 @@
+/*
+
+TODO reimplement this using a context menu when added, annoying to use without
 package org.learn_java.bot.commands.user;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -55,3 +56,4 @@ public class FormatCommand extends Command {
         }, error -> event.getChannel().sendMessage("Something bad happened, couldn't format").queue());
     }
 }
+*/

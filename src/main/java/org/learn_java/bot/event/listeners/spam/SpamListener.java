@@ -3,11 +3,8 @@ package org.learn_java.bot.event.listeners.spam;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.learn_java.bot.data.repositories.SpamRepository;
@@ -48,11 +45,11 @@ public class SpamListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		if (event.isWebhookMessage() || event.getMember() == null || event.getAuthor().isBot()) return;
+	public void onMessageReceived(MessageReceivedEvent event) {
+		if (event.getChannelType() != ChannelType.TEXT || event.isWebhookMessage() || event.getMember() == null || event.getAuthor().isBot()) return;
 		String message = event.getMessage().getContentRaw().trim();
 		Member member = event.getMember();
-		TextChannel channel = event.getChannel();
+		TextChannel channel = event.getTextChannel();
 
 		if (!message.isEmpty()) {
 			checkForRepeated(message, member, channel);
@@ -119,7 +116,7 @@ public class SpamListener extends ListenerAdapter {
 		}
 	}
 
-	private void checkIfMatchesSpam(GuildMessageReceivedEvent event, String message, String author) {
+	private void checkIfMatchesSpam(MessageReceivedEvent event, String message, String author) {
 		if (repository.findByMessage(message) != null) {
 			Member member = event.getMember();
 			if (member != null) {

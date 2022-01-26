@@ -2,13 +2,12 @@ package org.learn_java.bot.event.listeners.free;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
-import org.learn_java.bot.commands.user.run.Run;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +28,7 @@ public class FreeListener extends ListenerAdapter {
     private final Set<String> helpChannelIds;
     private final String availableCategoryId;
     private final String takenCategoryId;
-    private JDA jda;
+    private final JDA jda;
     private static final Logger logger = LoggerFactory.getLogger(FreeListener.class);
 
 
@@ -46,15 +45,15 @@ public class FreeListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
+    public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        if (event.getChannelType() == ChannelType.TEXT || event.getAuthor().isBot()) {
             return;
         }
-        moveChannel(event.getChannel(), takenCategoryId);
+        moveChannel(event.getTextChannel(), takenCategoryId);
     }
 
     private void moveChannel(TextChannel channel, String categoryId) {
-        Category parent = channel.getParent();
+        Category parent = channel.getParentCategory();
         if (!helpChannelIds.contains(channel.getId()) || (parent != null && parent.getId().equals(categoryId))) {
             return;
         }
