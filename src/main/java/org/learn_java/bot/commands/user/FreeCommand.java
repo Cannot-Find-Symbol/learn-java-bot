@@ -1,8 +1,10 @@
 package org.learn_java.bot.commands.user;
 
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +19,7 @@ import java.util.Set;
 @ConditionalOnProperty(value = "free.enabled", havingValue = "true", matchIfMissing = true)
 public class FreeCommand extends Command {
 
-    private final CommandData commandData;
+    private final SlashCommandData commandData;
     private final String availableCategoryId;
     private final Set<String> helpChannelIds;
 
@@ -25,7 +27,7 @@ public class FreeCommand extends Command {
                        @Value("${help.channelids}") String helpChannelIds,
                        @Value("${available.categoryid}") String availableCategoryId) {
         super("free", CommandType.ANY);
-        this.commandData = new CommandData(getName(), "frees current channel");
+        this.commandData = Commands.slash(getName(), "frees current channel");
         this.helpChannelIds = new HashSet<>(Arrays.asList(helpChannelIds.split(",")));
         this.availableCategoryId = availableCategoryId;
     }
@@ -41,14 +43,14 @@ public class FreeCommand extends Command {
     }
 
     @Override
-    public void executeSlash(SlashCommandEvent event) {
+    public void executeSlash(SlashCommandInteractionEvent event) {
         event.deferReply(true).queue();
         String response = run(event.getTextChannel()) ? "Success" : "Unable to free";
         event.getHook().sendMessage(response).queue();
     }
 
     @Override
-    public CommandData getCommandData() {
+    public SlashCommandData getSlashCommandData() {
         return commandData;
     }
 }

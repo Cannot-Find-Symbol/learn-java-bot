@@ -5,16 +5,15 @@ import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import org.learn_java.bot.data.entities.MemberRole;
 import org.learn_java.bot.data.entities.RoleGroup;
 import org.learn_java.bot.service.RoleGroupService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
@@ -34,12 +33,12 @@ public class RoleListener extends ListenerAdapter implements Startup {
 
     private Message createRoleMessage(List<Role> roles, RoleGroup group) {
         MessageBuilder builder = new MessageBuilder();
-        SelectionMenu.Builder menuBuilder = SelectionMenu.create("rolegroup" + ":" + group.getId());
+        SelectMenu.Builder menuBuilder = SelectMenu.create("rolegroup" + ":" + group.getId());
         Map<Long, Role> discordRoles = findGroupRoles(group, roles);
 
         List<MemberRole> memberRoles = group.getRoles().stream()
                 .sorted(Comparator.comparing(MemberRole::getOrdinal))
-                .collect(Collectors.toList());
+                .toList();
 
         memberRoles.forEach(role -> {
             Role discordRole = discordRoles.get(role.getId());
@@ -64,7 +63,8 @@ public class RoleListener extends ListenerAdapter implements Startup {
         return groupRoles;
     }
 
-    public void onSelectionMenu(@Nonnull SelectionMenuEvent event) {
+    @Override
+    public void onSelectMenuInteraction(@Nonnull SelectMenuInteractionEvent event) {
         String eventId = event.getComponentId();
         if (!eventId.startsWith("rolegroup")) return;
         event.deferReply(true).queue();

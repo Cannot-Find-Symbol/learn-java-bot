@@ -4,7 +4,7 @@ package org.learn_java.bot.commands.user;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
@@ -107,7 +107,7 @@ public class InfoCommand extends Command {
     }
 
     @Override
-    public void executeSlash(SlashCommandEvent event) {
+    public void executeSlash(SlashCommandInteractionEvent event) {
         String[] args = event.getArgs().split("\\s+", 3);
 
         if(event.getArgs().isBlank()){

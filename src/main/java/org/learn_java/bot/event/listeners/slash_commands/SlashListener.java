@@ -1,6 +1,6 @@
 package org.learn_java.bot.event.listeners.slash_commands;
 
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.learn_java.bot.commands.SlashCommand;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ public class SlashListener extends ListenerAdapter {
     }
 
     @Override
-    public void onSlashCommand(SlashCommandEvent event) {
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         String slashCommand = event.getName();
         commands.stream()
                 .filter(c -> c.getName().equalsIgnoreCase(slashCommand))

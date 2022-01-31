@@ -3,9 +3,11 @@ package org.learn_java.bot.commands.moderation;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.learn_java.bot.commands.CommandType;
 import org.learn_java.bot.commands.SlashCommand;
 import org.springframework.stereotype.Component;
@@ -14,21 +16,21 @@ import java.util.Objects;
 
 @Component
 public class BanCommand implements SlashCommand {
-	private final CommandData commandData;
+	private final SlashCommandData commandData;
 	private final CommandType commandType;
 	private final String name;
 
 	public BanCommand() {
 		this.name = "ban";
-		this.commandData = new CommandData(name, "bans user");
-		commandData.addOption(OptionType.USER, "member", "member to ban", true);
-		commandData.addOption(OptionType.STRING, "reason", "reason for ban", true);
+		this.commandData = Commands.slash(name, "bans user")
+				.addOption(OptionType.USER, "member", "member to ban", true)
+				.addOption(OptionType.STRING, "reason", "reason for ban", true);
 		this.commandType = CommandType.MODERATOR;
 		commandData.setDefaultEnabled(false);
 	}
 
 	@Override
-	public void executeSlash(SlashCommandEvent event) {
+	public void executeSlash(SlashCommandInteractionEvent event) {
 		event.deferReply(true).queue();
 		Member member = Objects.requireNonNull(event.getOption("member")).getAsMember();
 		if (!botHasPermissionToBan(Objects.requireNonNull(member))) {
@@ -48,7 +50,7 @@ public class BanCommand implements SlashCommand {
 	}
 
 	@Override
-	public CommandData getCommandData() {
+	public SlashCommandData getSlashCommandData() {
 		return commandData;
 	}
 

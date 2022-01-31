@@ -1,9 +1,12 @@
-/*
-
-TODO reimplement this using a context menu when added, annoying to use without
 package org.learn_java.bot.commands.user;
 
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.StringUtils;
+import org.learn_java.bot.commands.ContextCommand;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -12,48 +15,31 @@ import java.math.BigInteger;
 
 @Component
 @ConditionalOnProperty(value = "format.enabled", havingValue = "true", matchIfMissing = true)
-public class FormatCommand extends Command {
+public class FormatCommand implements ContextCommand {
 
     private static final BigInteger MAX_MESSAGE_ID = new BigInteger(String.valueOf(Long.MAX_VALUE));
+	private final CommandData contextCommandData;
 
     public FormatCommand(@Value("${format.cooldown:15}") int cooldown) {
-        this.name = "format";
-        this.help = "Formats users non formatted message";
-        this.cooldown = cooldown;
+		contextCommandData = Commands.context(Command.Type.MESSAGE, "Format");
+        //this.cooldown = cooldown;
     }
 
-    @Override
-    protected void execute(CommandEvent event) {
+	@Override
+	public void executeContextCommand(MessageContextInteractionEvent event) {
+		event.deferReply().queue();
+		if(!event.getName().equals("Format")) return;
+		String wrappedMessage = String.format("```%s\n%s\n```", "java", event.getTarget().getContentRaw());
+		event.getHook().sendMessage(wrappedMessage).queue(RestAction.getDefaultSuccess(), error -> event.getHook().sendMessage("Something bad happened, couldn't format"));
+	}
 
-        if (event.getArgs().isBlank()) {
-            event.getChannel().sendMessage("!format needs at least 1 argument").queue();
-            return;
-        }
+	@Override
+	public CommandData getContextCommandData() {
+		return contextCommandData;
+	}
 
-        String[] args = event.getArgs().trim().split(" ");
-
-        if (args.length > 2) {
-            event.getChannel().sendMessage("Too many arguments for format command, try again").queue();
-            return;
-        }
-
-        String messageId = args[0];
-        String language = args.length < 2 ? "java" : args[1];
-
-        if (!StringUtils.isNumeric(messageId)) {
-            event.getChannel().sendMessage("message id must be numeric, try again").queue();
-            return;
-        }
-
-        if (new BigInteger(messageId).compareTo(MAX_MESSAGE_ID) > 0) {
-            event.getChannel().sendMessage("Message id out of range, try again").queue();
-            return;
-        }
-
-        event.getChannel().retrieveMessageById(messageId).queue(message -> {
-            String wrappedMessage = String.format("```%s\n%s\n```", language, message.getContentRaw());
-            message.getChannel().sendMessage(wrappedMessage).queue();
-        }, error -> event.getChannel().sendMessage("Something bad happened, couldn't format").queue());
-    }
+	@Override
+	public String getName() {
+		return "Format";
+	}
 }
-*/

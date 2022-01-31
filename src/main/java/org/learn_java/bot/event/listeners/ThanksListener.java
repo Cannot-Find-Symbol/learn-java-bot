@@ -5,13 +5,13 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.learn_java.bot.data.entities.MemberInfo;
@@ -64,7 +64,7 @@ public class ThanksListener extends ListenerAdapter {
             List<SelectOption> options = createMemberSelectOptions(members);
             SelectOption dismiss = SelectOption.of("Nobody", "dismiss").withDescription("Select to dismiss this message");
             options.add(dismiss);
-            SelectionMenu menu = SelectionMenu.create("thanks" + ":" + event.getMember().getId()).addOptions(options).setPlaceholder("Member").build();
+            SelectMenu menu = SelectMenu.create("thanks" + ":" + event.getMember().getId()).addOptions(options).setPlaceholder("Member").build();
             event.getChannel().sendMessage("It looks like you've thanked someone, who helped you?")
                     .setActionRow(menu)
                     .queue(messageSentHandler(event));
@@ -127,7 +127,7 @@ public class ThanksListener extends ListenerAdapter {
         return event.getMember() != null && member.getIdLong() != event.getMember().getIdLong();
     }
 
-    public void onSelectionMenu(@Nonnull SelectionMenuEvent event) {
+    public void onSelectionMenuInteraction(@Nonnull SelectMenuInteractionEvent event) {
         String menuId = event.getComponentId();
         if (!menuId.startsWith("thanks")) return;
         String memberId = event.getComponentId().split(":")[1];

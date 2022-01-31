@@ -1,8 +1,11 @@
 package org.learn_java.bot.commands.moderation;
 
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
 import org.learn_java.bot.data.entities.Spam;
@@ -16,17 +19,17 @@ import java.util.Objects;
 @ConditionalOnProperty(value = "spam.enabled", havingValue = "true", matchIfMissing = true)
 public class SpamCommand extends Command {
     private final SpamService service;
-    private final CommandData commandData;
+    private final SlashCommandData commandData;
 
     public SpamCommand(SpamService service) {
         super("spam", CommandType.MODERATOR);
-        this.commandData = new CommandData(getName(), "adds message to spam list");
-        this.commandData.addOption(OptionType.STRING, "message", "message to add", true);
+        this.commandData = Commands.slash("spam", "adds message to spam list")
+                .addOption(OptionType.STRING, "message", "message to add");
         this.service = service;
     }
 
     @Override
-    public void executeSlash(SlashCommandEvent event) {
+    public void executeSlash(SlashCommandInteractionEvent event) {
         if (event.getUser().isBot()) {
             return;
         }
@@ -43,7 +46,7 @@ public class SpamCommand extends Command {
     }
 
     @Override
-    public CommandData getCommandData() {
+    public SlashCommandData getSlashCommandData() {
         return commandData;
     }
 }
