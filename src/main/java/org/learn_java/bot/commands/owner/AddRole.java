@@ -46,6 +46,7 @@ public class AddRole implements SlashCommand {
 				.addOption(OptionType.BOOLEAN, "unique", "unique", false)
 				.addOption(OptionType.STRING, "name", "group name", false)
 				.addOption(OptionType.STRING, "message", "Message to be sent", false);
+
 		commandData = Commands.slash("manage-roles", "manage role groups")
 				.addSubcommands(view, add, createGroup);
 		commandData.setDefaultEnabled(false);

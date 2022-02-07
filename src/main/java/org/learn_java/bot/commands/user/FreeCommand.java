@@ -53,4 +53,9 @@ public class FreeCommand extends Command {
     public SlashCommandData getSlashCommandData() {
         return commandData;
     }
+
+    @Override
+    public int getDelay() {
+        return 10;
+    }
 }

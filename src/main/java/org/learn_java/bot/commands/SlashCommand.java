@@ -7,6 +7,9 @@ public interface SlashCommand {
      void executeSlash(SlashCommandInteractionEvent event);
      String getName();
      SlashCommandData getSlashCommandData();
+     default int getDelay() {
+          return 0;
+     }
 
      default CommandType getType() {
           return CommandType.ANY;
