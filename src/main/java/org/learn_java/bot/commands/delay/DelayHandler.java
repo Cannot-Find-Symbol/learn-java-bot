@@ -1,6 +1,7 @@
 package org.learn_java.bot.commands.delay;
 
 import org.jetbrains.annotations.NotNull;
+import org.learn_java.bot.commands.SlashCommand;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -42,16 +43,16 @@ public class DelayHandler {
 		return Duration.between(time, now.atOffset(time.getOffset())).toMinutes() >= 5;
 	}
 
-
-	public int secondsUntilNextUse(String commandName, Long memberId, int timeout) {
+	public int secondsUntilNextUse(Long memberId, SlashCommand command) {
 		if(!tracker.containsKey(memberId)) return 0;
+		String commandName = command.getName();
 		var memberCommandTimes = tracker.get(memberId);
-		if(!memberCommandTimes.containsKey(commandName) || memberCommandTimes.get(commandName).size() < 3) return 0;
+		if(!memberCommandTimes.containsKey(commandName) || memberCommandTimes.get(commandName).size() < command.getQuickLimit()) return 0;
 
 		Duration duration = timeBetweenLastUse(commandName, memberCommandTimes);
 
-		if (duration.getSeconds() <= timeout) {
-			return (int) Math.ceil((timeout - duration.getSeconds()));
+		if (duration.getSeconds() <= command.getDelay()) {
+			return (int) Math.ceil((command.getDelay() - duration.getSeconds()));
 		}
 
 		return 0;

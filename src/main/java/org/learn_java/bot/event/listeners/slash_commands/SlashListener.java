@@ -28,15 +28,15 @@ public class SlashListener extends ListenerAdapter {
                 .ifPresent(command -> executeCommand(event, command));
     }
 
-    private void executeCommand(SlashCommandInteractionEvent event, SlashCommand value) {
+    private void executeCommand(SlashCommandInteractionEvent event, SlashCommand command) {
         if(event.getMember() == null) return;
-        int delayUntilNextUse = delayHandler.secondsUntilNextUse(value.getName(), event.getMember().getIdLong(), value.getDelay());
+        int delayUntilNextUse = delayHandler.secondsUntilNextUse(event.getMember().getIdLong(), command);
         if(delayUntilNextUse > 0) {
             event.deferReply(true).queue();
             event.getHook().sendMessage("That command is on cooldown for another " + delayUntilNextUse + " seconds").queue();
         } else {
-            value.executeSlash(event);
-            delayHandler.trackUse(event.getMember().getIdLong(), value.getName(), event.getTimeCreated());
+            command.executeSlash(event);
+            delayHandler.trackUse(event.getMember().getIdLong(), command.getName(), event.getTimeCreated());
         }
     }
 }
