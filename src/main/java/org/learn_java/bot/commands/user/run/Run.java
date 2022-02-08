@@ -12,11 +12,9 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.learn_java.bot.commands.ContextCommand;
-import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.ekmc.PistonService;
 import org.learn_java.ekmc.model.Language;
 import org.learn_java.ekmc.model.RunRequest;
@@ -35,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component

@@ -1,7 +1,8 @@
 package org.learn_java.bot.data.entities;
 
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 public class MemberInfo {

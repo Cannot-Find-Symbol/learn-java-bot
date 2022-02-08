@@ -14,8 +14,4 @@ public interface SlashCommand {
      default int getQuickLimit() {
           return 2;
      }
-
-     default CommandType getType() {
-          return CommandType.ANY;
-     }
 }

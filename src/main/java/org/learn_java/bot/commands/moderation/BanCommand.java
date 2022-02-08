@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.learn_java.bot.commands.CommandType;
@@ -52,11 +51,6 @@ public class BanCommand implements SlashCommand {
 	@Override
 	public SlashCommandData getSlashCommandData() {
 		return commandData;
-	}
-
-	@Override
-	public CommandType getType() {
-		return this.commandType;
 	}
 
 	private boolean botHasPermissionToBan(Member member) {

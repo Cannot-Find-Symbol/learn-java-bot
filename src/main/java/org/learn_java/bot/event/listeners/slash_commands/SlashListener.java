@@ -2,8 +2,8 @@ package org.learn_java.bot.event.listeners.slash_commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.learn_java.bot.commands.delay.DelayHandler;
 import org.learn_java.bot.commands.SlashCommand;
+import org.learn_java.bot.commands.delay.DelayHandler;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

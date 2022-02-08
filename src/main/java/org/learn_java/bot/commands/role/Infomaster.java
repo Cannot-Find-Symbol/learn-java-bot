@@ -34,7 +34,8 @@ public class Infomaster extends Command {
 				.addOption(OptionType.STRING, "topic", "chosen topic", true);
 
 		this.commandData = Commands.slash(getName(), "infomaster commands")
-				.addSubcommands(add, update, delete);
+				.addSubcommands(add, update, delete)
+				.setDefaultEnabled(false);
 	}
 
 
