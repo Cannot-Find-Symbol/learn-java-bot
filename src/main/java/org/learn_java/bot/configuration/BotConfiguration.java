@@ -65,7 +65,7 @@ public class BotConfiguration {
         s.stream().filter(c -> ownerCommands.contains(c.getName())).forEach(command -> enableForOwner(config, command, guild));
         Set<String> moderatorCommands = getCommandNamesByType(CommandType.MODERATOR);
         s.stream().filter(c -> moderatorCommands.contains(c.getName())).forEach(command -> enableForModerators(config, command, guild));
-
+        // TODO enable role commands elegantly
     }
 
     private void enableForOwner(Config config, net.dv8tion.jda.api.interactions.commands.Command command, Guild guild) {
@@ -79,6 +79,11 @@ public class BotConfiguration {
                 .collect(Collectors.toList());
 
         command.updatePrivileges(guild, rolePrivileges).queue();
+    }
+
+    private void enableForRole(Config config, String roleId, net.dv8tion.jda.api.interactions.commands.Command command, Guild guild) {
+        CommandPrivilege privilege = CommandPrivilege.enableRole(roleId);
+        command.updatePrivileges(guild, privilege).queue();
     }
 
     @NotNull
