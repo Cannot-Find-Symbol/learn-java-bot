@@ -53,8 +53,8 @@ public class BotConfiguration {
         Objects.requireNonNull(jda.getGuildById(config.getGuildId()))
                 .updateCommands()
                 .addCommands(slash)
-                .addCommands(context).
-                queue((s) -> enablePrivilegedSlashCommands());
+                .addCommands(context)
+                .queue((s) -> enablePrivilegedSlashCommands());
     }
 
     private void enablePrivilegedSlashCommands() {

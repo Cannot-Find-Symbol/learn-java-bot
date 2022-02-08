@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
 import org.learn_java.bot.commands.SlashCommand;
 import org.springframework.stereotype.Component;
@@ -14,17 +15,15 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class BanCommand implements SlashCommand {
+public class BanCommand extends Command {
 	private final SlashCommandData commandData;
-	private final CommandType commandType;
-	private final String name;
 
 	public BanCommand() {
-		this.name = "ban";
-		this.commandData = Commands.slash(name, "bans user")
+		super("ban", CommandType.MODERATOR);
+		this.commandData = Commands.slash(getName(), "bans user")
 				.addOption(OptionType.USER, "member", "member to ban", true)
-				.addOption(OptionType.STRING, "reason", "reason for ban", true);
-		this.commandType = CommandType.MODERATOR;
+				.addOption(OptionType.STRING, "reason", "reason for ban", true)
+				.setDefaultEnabled(false);
 		commandData.setDefaultEnabled(false);
 	}
 
@@ -41,11 +40,6 @@ public class BanCommand implements SlashCommand {
 				.queue(s -> event.getHook().sendMessage("Ban succuessful").queue(),
 						e -> event.getHook().sendMessage("An error occured while trying to ban member").queue());
 
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override

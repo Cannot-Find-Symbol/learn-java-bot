@@ -37,7 +37,8 @@ public class WarnCommand extends Command {
 				.addOption(OptionType.STRING, "reason", "reason for warn", true);
 
 		this.commandData = Commands.slash(getName(), "warn utility")
-				.addSubcommands(show, add);
+				.addSubcommands(show, add)
+				.setDefaultEnabled(false);
 
 		this.service = service;
 	}
@@ -56,7 +57,7 @@ public class WarnCommand extends Command {
 
 	@Override
 	public void executeSlash(SlashCommandInteractionEvent event) {
-		event.deferReply(true).queue();
+		event.deferReply().queue();
 		String subcommandName = Objects.requireNonNull(event.getSubcommandName());
 		User user = Objects.requireNonNull(event.getOption("member")).getAsUser();
 		switch (subcommandName) {
@@ -68,7 +69,7 @@ public class WarnCommand extends Command {
 	private void handleAdd(SlashCommandInteractionEvent event, User user) {
 		String reason = Objects.requireNonNull(event.getOption("reason")).getAsString();
 		service.save(createWarn(user, reason));
-		event.getHook().sendMessage("warn added").queue();
+		event.getHook().sendMessage(user.getAsMention() + " you have been warned for: " + reason).queue();
 	}
 
 	@Override

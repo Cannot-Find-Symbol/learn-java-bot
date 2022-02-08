@@ -82,14 +82,4 @@ public class Info extends Command {
 	public SlashCommandData getSlashCommandData() {
 		return this.commandData;
 	}
-
-	@Override
-	public int getDelay() {
-		return 10;
-	}
-
-	@Override
-	public int getQuickLimit() {
-		return 2;
-	}
 }

@@ -1,5 +1,8 @@
 package org.learn_java.ekmc.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RunResponse {
     String language;
     String version;

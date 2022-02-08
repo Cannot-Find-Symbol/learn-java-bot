@@ -23,7 +23,8 @@ public class SpamCommand extends Command {
     public SpamCommand(SpamService service) {
         super("spam", CommandType.MODERATOR);
         this.commandData = Commands.slash("spam", "adds message to spam list")
-                .addOption(OptionType.STRING, "message", "message to add");
+                .addOption(OptionType.STRING, "message", "message to add")
+                .setDefaultEnabled(false);
         this.service = service;
     }
 

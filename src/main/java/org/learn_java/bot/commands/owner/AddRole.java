@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
-import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.bot.data.entities.MemberRole;
 import org.learn_java.bot.data.entities.RoleGroup;
 import org.learn_java.bot.event.listeners.RoleListener;
@@ -21,16 +21,14 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class AddRole implements SlashCommand {
-	private final String name;
+public class AddRole extends Command {
 	private final SlashCommandData commandData;
 	private final RoleGroupService service;
 	private final RoleListener listener;
-	private final CommandType commandType;
 
 	public AddRole(RoleGroupService service, RoleListener listener) {
+		super("manage-roles", CommandType.OWNER);
 		this.listener = listener;
-		this.name = "manage-roles";
 
 		SubcommandData view = new SubcommandData("view", "view current roles");
 
@@ -49,7 +47,6 @@ public class AddRole implements SlashCommand {
 		commandData = Commands.slash("manage-roles", "manage role groups")
 				.addSubcommands(view, add, createGroup);
 		commandData.setDefaultEnabled(false);
-		this.commandType = CommandType.OWNER;
 		this.service = service;
 	}
 
@@ -111,11 +108,6 @@ public class AddRole implements SlashCommand {
 			}
 		}
 		return "ERROR";
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override

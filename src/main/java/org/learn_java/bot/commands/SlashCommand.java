@@ -12,6 +12,6 @@ public interface SlashCommand {
      }
 
      default int getQuickLimit() {
-          return 2;
+          return 1;
      }
 }

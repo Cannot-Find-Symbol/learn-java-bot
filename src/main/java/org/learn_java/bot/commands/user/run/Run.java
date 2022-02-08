@@ -39,8 +39,6 @@ import java.util.regex.Pattern;
 public class Run implements ContextCommand {
 	private final String name;
 	private final CommandData commandData;
-	private final SlashCommandData slashCommandData;
-	private final Pattern pattern = Pattern.compile("https://discord.com/channels/(?>\\d{18}/){2}(\\d{18})");
 	private final PistonService pistonService;
 
 	private Map<String, Language> languageMap;
@@ -66,8 +64,6 @@ public class Run implements ContextCommand {
 		SubcommandData runMessageLink = new SubcommandData("from-message-link", "run code from message link");
 		runMessageLink.addOption(OptionType.STRING, "link", "link to message that contains code", true);
 		this.commandData = Commands.context(Command.Type.MESSAGE, "run");
-		this.slashCommandData = Commands.slash(name, "runs code")
-				.addSubcommands(runId, runMessageLink);
 		this.pistonService = pistonService;
 	}
 
@@ -75,8 +71,7 @@ public class Run implements ContextCommand {
 		if (languageMap == null || Duration.between(lastLanguageRefresh, LocalDateTime.now()).toHours() > 24) {
 			try {
 				Response<List<Language>> response = pistonService.getRuntimes().execute();
-				Objects.requireNonNull(response.body(), "Piston service getRuntimes returned null body");
-				languageMap = buildLanguageMap(response.body());
+				languageMap = buildLanguageMap(Objects.requireNonNull(response.body()));
 				this.lastLanguageRefresh = LocalDateTime.now();
 			} catch (IOException io) {
 				logger.error(String.valueOf(io));
@@ -95,7 +90,7 @@ public class Run implements ContextCommand {
 
 	private void sendResponseToChannel(Message message, InteractionHook hook) {
 		String lang = StringUtils.substringBetween(message.getContentRaw(), "```", "\n");
-		String code = StringUtils.substringBetween(message.getContentRaw(), "```" + lang, "```");
+		String code = StringUtils.substringBetween(message.getContentRaw(), "```" + lang + "\n", "```");
 
 		if (languageMap.containsKey(lang)) {
 			Language language = languageMap.get(lang);
@@ -164,7 +159,7 @@ public class Run implements ContextCommand {
 			event.getInteraction().getTargetType();
 			sendResponseToChannel(event.getTarget(), event.getHook());
 		}
-		event.getInteraction().reply("Had an issue with this command").queue();
+		event.getHook().sendMessage("Had an issue with this command").queue();
 	}
 
 	@Override

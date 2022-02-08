@@ -71,7 +71,7 @@ public class Leaderboard implements SlashCommand {
 					.map(member -> new MemberInfoDTO(member, getThankCount(member, event.getSubcommandName())))
 					.filter(dto -> dto.getThankCount() > 0)
 					.sorted(Comparator.comparing(MemberInfoDTO::getThankCount).reversed())
-					.collect(Collectors.toList());
+					.toList();
 
 			int maxNameLength = members.stream().map(Member::getEffectiveName).mapToInt(String::length).max().orElse(-1);
 			StringBuilder sb = new StringBuilder();
