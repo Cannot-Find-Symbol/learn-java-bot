@@ -45,7 +45,7 @@ public class FreeListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (event.getChannelType() == ChannelType.TEXT || event.getAuthor().isBot()) {
+        if (event.getChannelType() != ChannelType.TEXT || event.getAuthor().isBot()) {
             return;
         }
         moveChannel(event.getTextChannel(), takenCategoryId);
