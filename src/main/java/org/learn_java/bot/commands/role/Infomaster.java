@@ -1,18 +1,18 @@
 package org.learn_java.bot.commands.role;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
-import org.learn_java.bot.data.dtos.InfoDTO;
 import org.learn_java.bot.data.entities.Info;
 import org.learn_java.bot.service.InfoService;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.Objects;
 
 @Component
@@ -24,17 +24,21 @@ public class Infomaster extends Command {
 		super("infomaster", CommandType.ROLE);
 		this.service = service;
 
-		SubcommandData add = new SubcommandData("add", "add topic")
+		SubcommandData fromContent = new SubcommandData("from-content", "add topic from content option")
 				.addOption(OptionType.STRING, "topic", "chosen topic", true)
 				.addOption(OptionType.STRING, "content", "topic content", true);
-		SubcommandData update = new SubcommandData("update", "update topic")
+		SubcommandData fromMessage = new SubcommandData("from-message", "add topic from message")
 				.addOption(OptionType.STRING, "topic", "chosen topic", true)
-				.addOption(OptionType.STRING, "content", "topic content", true);
+				.addOption(OptionType.STRING, "message-id", "message to use", true);
 		SubcommandData delete = new SubcommandData("delete", "delete topic")
 				.addOption(OptionType.STRING, "topic", "chosen topic", true);
-
+		SubcommandGroupData add = new SubcommandGroupData("add", "add topic from content option")
+				.addSubcommands(fromContent, fromMessage);
+		SubcommandGroupData update = new SubcommandGroupData("update", "update topic")
+				.addSubcommands(fromContent, fromMessage);
 		this.commandData = Commands.slash(getName(), "infomaster commands")
-				.addSubcommands(add, update, delete)
+				.addSubcommandGroups(add, update)
+				.addSubcommands(delete)
 				.setDefaultEnabled(false);
 	}
 
@@ -42,7 +46,8 @@ public class Infomaster extends Command {
 	@Override
 	public void executeSlash(SlashCommandInteractionEvent event) {
 		event.deferReply(true).queue();
-		switch(Objects.requireNonNull(event.getSubcommandName())){
+		String rootCommand = event.getSubcommandGroup() != null ? event.getSubcommandGroup() : event.getSubcommandName();
+		switch (Objects.requireNonNull(rootCommand)) {
 			case "add" -> handleAdd(event);
 			case "update" -> handleUpdate(event);
 			case "delete" -> handleDelete(event);
@@ -50,24 +55,67 @@ public class Infomaster extends Command {
 	}
 
 	public void handleAdd(SlashCommandInteractionEvent event) {
-		String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
-		String content = Objects.requireNonNull(event.getOption("content")).getAsString();
-		service.save(new Info(topic, content));
-		event.getHook().sendMessage("Succuessfully saved").queue();
+		switch (Objects.requireNonNull(event.getSubcommandName())) {
+			case "from-content" -> handleAddFromContent(event);
+			case "from-message" -> handleAddFromMessage(event);
+		}
 	}
 
-	@Transactional
+
+	private void handleAddFromContent(SlashCommandInteractionEvent event) {
+		String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
+		String content = Objects.requireNonNull(event.getOption("content")).getAsString();
+		saveMessage(topic, content, event);
+	}
+
+	private void handleAddFromMessage(SlashCommandInteractionEvent event) {
+		String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
+		String messageId = Objects.requireNonNull(event.getOption("message-id")).getAsString();
+		event.getTextChannel().retrieveMessageById(messageId).queue((message) -> saveMessage(topic, message.getContentRaw(), event), (e) -> sendReply(event, "Failed to save, possibly message id was bad?"));
+	}
+
+	private void sendReply(SlashCommandInteractionEvent event, String content) {
+		event.getHook().sendMessage(content).queue();
+	}
+
+	private void saveMessage(String topic, String message, SlashCommandInteractionEvent event) {
+		service.save(new Info(topic, message));
+		sendReply(event, "Successfully saved");
+	}
+
 	public void handleUpdate(SlashCommandInteractionEvent event) {
-		String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
-		String content = Objects.requireNonNull(event.getOption("content")).getAsString();
-		service.findById(topic).ifPresentOrElse((info) -> update(content, info, event),
-				() -> event.getHook().sendMessage("Sorry, can't find topic by that name").queue()
-		);
+		switch (Objects.requireNonNull(event.getSubcommandName())) {
+			case "from-content" -> handleUpdateFromContent(event);
+			case "from-message" -> handleUpdateFromMessage(event);
+		}
 	}
 
-	private void update(String content, InfoDTO info, SlashCommandInteractionEvent event) {
+	private void handleUpdateFromContent(SlashCommandInteractionEvent event) {
+		String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
+		String content = Objects.requireNonNull(event.getOption("content")).getAsString();
+		service.findById(topic).ifPresentOrElse(
+				(info) -> update(content, info, event),
+				() -> sendReply(event, "Sorry, can't find topic by that name"));
+	}
+
+	private void handleUpdateFromMessage(SlashCommandInteractionEvent event) {
+		String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
+		String messageId = Objects.requireNonNull(event.getOption("message-id")).getAsString();
+		event.getTextChannel().retrieveMessageById(messageId).queue(
+				(message) -> updateFromFoundMessage(event, topic, message),
+				(error) -> sendReply(event, "Failed to save, possibly message id was bad?"));
+	}
+
+	private void updateFromFoundMessage(SlashCommandInteractionEvent event, String topic, Message message) {
+		service.findById(topic).ifPresentOrElse(
+				(info) -> update(message.getContentRaw(), info, event),
+				() -> sendReply(event, "Sorry, can't find topic by that name"));
+	}
+
+	private void update(String content, Info info, SlashCommandInteractionEvent event) {
 		info.setMessage(content);
-		event.getHook().sendMessage("Succuessfully deleted").queue();
+		service.save(info);
+		sendReply(event, "Successfully updated");
 	}
 
 	public void handleDelete(SlashCommandInteractionEvent event) {
@@ -75,10 +123,10 @@ public class Infomaster extends Command {
 
 
 		if (!service.existsById(topic)) {
-			event.getHook().sendMessage("Failed to delete topic, possibly doesn't exist?").queue();
+			sendReply(event, "Failed to delete topic, possibly doesn't exist?");
 		} else {
 			service.deleteById(topic);
-			event.getHook().sendMessage("Succuessfully deleted").queue();
+			sendReply(event, "Successfully deleted");
 		}
 	}
 
