@@ -44,6 +44,7 @@ public class QuestionListener extends ListenerAdapter implements Startup {
 
 	@Override
 	public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+		if(questionChannelId != event.getChannel().getIdLong()) return;
 		if (shouldIgnoreEvent(event)) {
 			deleteMessageIfNotFromBot(event);
 			return;
