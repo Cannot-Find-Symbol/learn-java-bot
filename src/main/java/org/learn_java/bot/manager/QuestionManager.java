@@ -28,7 +28,7 @@ public class QuestionManager {
 	}
 
 	public boolean doesUserOwnThread(@NotNull Long userId, @NotNull Long threadId) {
-		if(userThreadTracker.containsKey(userId)){
+		if (userThreadTracker.containsKey(userId)) {
 			return userThreadTracker.get(userId).contains(threadId);
 		}
 		return false;
@@ -38,9 +38,8 @@ public class QuestionManager {
 		return recentlyUsed.contains(userId);
 	}
 
-	@NotNull
-	private ScheduledFuture<?> scheduleClearTimeout(@NotNull Long userId) {
-		return executorService.schedule(() -> {
+	private void scheduleClearTimeout(@NotNull Long userId) {
+		executorService.schedule(() -> {
 			recentlyUsed.remove(userId);
 		}, 10, TimeUnit.SECONDS);
 	}
