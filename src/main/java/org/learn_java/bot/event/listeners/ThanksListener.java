@@ -124,7 +124,8 @@ public class ThanksListener extends ListenerAdapter {
         return event.getMember() != null && member.getIdLong() != event.getMember().getIdLong();
     }
 
-    public void onSelectionMenuInteraction(@Nonnull SelectMenuInteractionEvent event) {
+    @Override
+    public void onSelectMenuInteraction(@Nonnull SelectMenuInteractionEvent event) {
         String menuId = event.getComponentId();
         if (!menuId.startsWith("thanks")) return;
         String memberId = event.getComponentId().split(":")[1];
