@@ -1,29 +1,28 @@
 package org.learn_java.bot.commands.user;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
+
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import org.learn_java.bot.commands.SlashCommand;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.learn_java.bot.commands.Command;
+import org.learn_java.bot.commands.CommandType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.function.Function;
 
 @Component
 @ConditionalOnProperty(value = "code.enabled", havingValue = "true", matchIfMissing = true)
-public class CodeCommand extends Command implements SlashCommand {
+public class CodeCommand extends Command {
 
     private final Message message;
-    private final CommandData commandData;
+    private final SlashCommandData commandData;
 
     public CodeCommand() {
-        this.name = "code";
+        super("code", CommandType.ANY);
         message = buildMessage();
-        this.commandData = new CommandData(name, "sends code block message");
+        this.commandData = Commands.slash(getName(), "sends code block message");
     }
 
     private Message buildMessage() {
@@ -38,17 +37,12 @@ public class CodeCommand extends Command implements SlashCommand {
     }
 
     @Override
-    protected void execute(CommandEvent commandEvent) {
-        commandEvent.reply(message);
-    }
-
-    @Override
-    public void executeSlash(SlashCommandEvent event) {
+    public void executeSlash(SlashCommandInteractionEvent event) {
         event.reply(message).queue();
     }
 
     @Override
-    public CommandData getCommandData() {
+    public SlashCommandData getSlashCommandData() {
         return commandData;
     }
 

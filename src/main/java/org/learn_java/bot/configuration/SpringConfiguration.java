@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Lazy;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 @Configuration
 public class SpringConfiguration {
     @Bean
@@ -17,5 +20,10 @@ public class SpringConfiguration {
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
         return retrofit.create(PistonService.class);
+    }
+
+    @Bean
+    public ScheduledExecutorService createExecutorService() {
+        return Executors.newSingleThreadScheduledExecutor();
     }
 }

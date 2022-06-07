@@ -1,46 +1,41 @@
 package org.learn_java.bot.commands.user;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import org.learn_java.bot.commands.SlashCommand;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import org.learn_java.bot.commands.Command;
+import org.learn_java.bot.commands.CommandType;
+import org.learn_java.bot.manager.QuestionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 @Component
 @ConditionalOnProperty(value = "free.enabled", havingValue = "true", matchIfMissing = true)
-public class FreeCommand extends Command implements SlashCommand {
+public class FreeCommand extends Command {
 
-    private final CommandData commandData;
+    private final SlashCommandData commandData;
     private final String availableCategoryId;
     private final Set<String> helpChannelIds;
+    private final QuestionManager questionManager;
 
     public FreeCommand(@Value("${free.cooldown:5}") int cooldown,
                        @Value("${help.channelids}") String helpChannelIds,
-                       @Value("${available.categoryid}") String availableCategoryId) {
-        this.name = "free";
-        this.cooldown = cooldown;
-        this.commandData = new CommandData(name, "frees current channel");
+                       @Value("${available.categoryid}") String availableCategoryId, QuestionManager questionManager) {
+        super("free", CommandType.ANY);
+        this.questionManager = questionManager;
+        this.commandData = Commands.slash(getName(), "frees current channel");
         this.helpChannelIds = new HashSet<>(Arrays.asList(helpChannelIds.split(",")));
         this.availableCategoryId = availableCategoryId;
     }
 
-    @Override
-    protected void execute(CommandEvent event) {
-        run(event.getTextChannel());
-    }
-
     private boolean run(TextChannel channel) {
-        net.dv8tion.jda.api.entities.Category parent = channel.getParent();
+        net.dv8tion.jda.api.entities.Category parent = channel.getParentCategory();
         if (!helpChannelIds.contains(channel.getId()) || (parent != null && parent.getId().equals(availableCategoryId))) {
             return false;
         }
@@ -50,14 +45,31 @@ public class FreeCommand extends Command implements SlashCommand {
     }
 
     @Override
-    public void executeSlash(SlashCommandEvent event) {
+    public void executeSlash(SlashCommandInteractionEvent event) {
         event.deferReply(true).queue();
-        String response = run(event.getTextChannel()) ? "Success" : "Unable to free";
-        event.getHook().sendMessage(response).queue();
+        String result = switch(event.getChannel().getType()) {
+            case GUILD_PUBLIC_THREAD -> archiveChannel(event);
+            case TEXT -> run(event.getTextChannel()) ? "Success" : "Unable to free";
+            default -> "Free not supported here";
+        };
+        event.getHook().sendMessage(result).queue();
+    }
+
+    private String archiveChannel(SlashCommandInteractionEvent event) {
+        if(questionManager.doesUserOwnThread(event.getUser().getIdLong(), event.getThreadChannel().getIdLong())){
+            event.getThreadChannel().getManager().setArchived(true).queue();
+            return "Success";
+        }
+        return "Sorry, you don't own this thread";
     }
 
     @Override
-    public CommandData getCommandData() {
+    public SlashCommandData getSlashCommandData() {
         return commandData;
+    }
+
+    @Override
+    public int getDelay() {
+        return 10;
     }
 }

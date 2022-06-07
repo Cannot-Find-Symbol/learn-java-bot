@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(value = "info.enabled", havingValue = "true", matchIfMissing = true)
 public class InfoService {
 
-    private InfoRepository repository;
-    private Mapper mapper;
+    private final InfoRepository repository;
+    private final Mapper mapper;
 
     public InfoService(InfoRepository repository, Mapper mapper) {
         this.repository = repository;
@@ -29,8 +29,8 @@ public class InfoService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<InfoDTO> findById(String id){
-        return repository.findById(id).map(mapper::mapToInfoDTO);
+    public Optional<Info> findById(String id){
+        return repository.findById(id);
     }
 
     public InfoDTO save(Info info) {

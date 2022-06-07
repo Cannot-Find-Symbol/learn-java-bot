@@ -1,15 +1,15 @@
 package org.learn_java.bot.configuration;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandClient;
-import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import org.jetbrains.annotations.NotNull;
+import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
+import org.learn_java.bot.commands.ContextCommand;
 import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.bot.event.listeners.Startup;
 import org.springframework.context.annotation.Configuration;
@@ -23,16 +23,21 @@ import java.util.stream.Collectors;
 @Configuration
 public class BotConfiguration {
     private final JDA jda;
-    private final List<SlashCommand> slashCommands;
     private final List<Command> commands;
+    private final List<ContextCommand> contextCommands;
     private final ListenerAdapter[] listeners;
     private final List<Startup> startups;
     private final Config config;
 
-    public BotConfiguration(JDA jda, List<SlashCommand> slashCommands, List<Command> commands, ListenerAdapter[] listeners, List<Startup> startups, Config config) {
+
+    public BotConfiguration(JDA jda,
+                            List<Command> commands,
+                            List<ContextCommand> contextCommands, ListenerAdapter[] listeners,
+                            List<Startup> startups,
+                            Config config) {
         this.jda = jda;
-        this.slashCommands = slashCommands;
         this.commands = commands;
+        this.contextCommands = contextCommands;
         this.listeners = listeners;
         this.startups = startups;
         this.config = config;
@@ -40,16 +45,16 @@ public class BotConfiguration {
 
     @PostConstruct
     public void configure() {
-        CommandClientBuilder builder = new CommandClientBuilder();
-        builder.setOwnerId(config.getOwner());
-        builder.setPrefix(config.getPrefix());
-        commands.forEach(builder::addCommand);
-        CommandClient client = builder.build();
-        CommandData[] slash = slashCommands.stream().map(SlashCommand::getCommandData).toArray(CommandData[]::new);
+        SlashCommandData[] slash = commands.stream().map(SlashCommand::getSlashCommandData).toArray(SlashCommandData[]::new);
+        CommandData[] context = contextCommands.stream().map(ContextCommand::getContextCommandData).toArray(CommandData[]::new);
+
         jda.addEventListener((Object[]) listeners);
-        jda.addEventListener(client);
         startups.forEach(Startup::startup);
-        Objects.requireNonNull(jda.getGuildById(config.getGuildId())).updateCommands().addCommands(slash).queue((s) -> enablePrivilegedSlashCommands());
+        Objects.requireNonNull(jda.getGuildById(config.getGuildId()))
+                .updateCommands()
+                .addCommands(slash)
+                .addCommands(context)
+                .queue((s) -> enablePrivilegedSlashCommands());
     }
 
     private void enablePrivilegedSlashCommands() {
@@ -65,7 +70,8 @@ public class BotConfiguration {
         s.stream().filter(c -> ownerCommands.contains(c.getName())).forEach(command -> enableForOwner(config, command, guild));
         Set<String> moderatorCommands = getCommandNamesByType(CommandType.MODERATOR);
         s.stream().filter(c -> moderatorCommands.contains(c.getName())).forEach(command -> enableForModerators(config, command, guild));
-
+        Set<String> roleCommands = getCommandNamesByType(CommandType.ROLE);
+        s.stream().filter(c -> roleCommands.contains(c.getName())).forEach(command -> enableForRole(config, command, guild, commands));
     }
 
     private void enableForOwner(Config config, net.dv8tion.jda.api.interactions.commands.Command command, Guild guild) {
@@ -74,13 +80,24 @@ public class BotConfiguration {
     }
 
     private void enableForModerators(Config config, net.dv8tion.jda.api.interactions.commands.Command command, Guild guild) {
-        List<CommandPrivilege> rolePrivileges = config.getModeratorRoleIds().stream().map(CommandPrivilege::enableRole).collect(Collectors.toList());
+        List<CommandPrivilege> rolePrivileges = config.getModeratorRoleIds().stream()
+                .map(CommandPrivilege::enableRole)
+                .collect(Collectors.toList());
+
         command.updatePrivileges(guild, rolePrivileges).queue();
+    }
+
+    private void enableForRole(Config config, net.dv8tion.jda.api.interactions.commands.Command command, Guild guild, List<Command> commands) {
+        if(config.getRoleCommands().containsKey(command.getName())){
+            CommandPrivilege privilege = CommandPrivilege.enableRole(config.getRoleCommands().get(command.getName()));
+            command.updatePrivileges(guild, privilege).queue();
+        }
     }
 
     @NotNull
     private Set<String> getCommandNamesByType(CommandType type) {
-        return slashCommands.stream()
-                .filter(command -> command.getType() == type).map(SlashCommand::getName).collect(Collectors.toSet());
+        return commands.stream()
+                .filter(command -> command.getCommandType() == type).map(Command::getName).collect(Collectors.toSet());
     }
+
 }

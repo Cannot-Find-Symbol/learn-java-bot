@@ -1,7 +1,6 @@
 package org.learn_java.bot.commands.user.run;
 
 import net.dv8tion.jda.api.entities.Member;
-import org.learn_java.bot.data.entities.MemberInfo;
 
 public class MemberInfoDTO {
     private Member member;
