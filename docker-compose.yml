@@ -1,0 +1,30 @@
+version: "3.3"
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_bot
+    env_file:
+        - bot.env.example
+    depends_on:
+      - "database"
+    entrypoint: "wait-for-it database:3306 -- java -jar lj-bot-1.0-SNAPSHOT.jar"
+    environment:
+      - spring.datasource.url=jdbc:mariadb://database:3306/LEARNJAVA
+      - spring.datasource.username=root
+      - spring.datasource.password=test
+    volumes:
+      - learn-java-config:/etc/learn-java-bot
+    restart: unless-stopped
+  database:
+    image: mariadb:latest
+    ports:
+      - "3306"
+    environment:
+      - MARIADB_ROOT_PASSWORD=test
+      - MARIADB_DATABASE=LEARNJAVA
+    volumes:
+      - learn-java-db
+volumes:
+  learn-java-config:
+  learn-java-db:
