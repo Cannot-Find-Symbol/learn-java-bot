@@ -13,32 +13,30 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 
 @Component
-@ConditionalOnProperty(value = "format.enabled", havingValue = "true", matchIfMissing = true)
 public class FormatCommand implements ContextCommand {
 
     private static final BigInteger MAX_MESSAGE_ID = new BigInteger(String.valueOf(Long.MAX_VALUE));
-	private final CommandData contextCommandData;
+    private final CommandData contextCommandData;
 
-    public FormatCommand(@Value("${format.cooldown:15}") int cooldown) {
-		contextCommandData = Commands.context(Command.Type.MESSAGE, "Format");
-        //this.cooldown = cooldown;
+    public FormatCommand() {
+        contextCommandData = Commands.context(Command.Type.MESSAGE, "Format");
     }
 
-	@Override
-	public void executeContextCommand(MessageContextInteractionEvent event) {
-		event.deferReply().queue();
-		if(!event.getName().equals("Format")) return;
-		String wrappedMessage = String.format("```%s\n%s\n```", "java", event.getTarget().getContentRaw());
-		event.getHook().sendMessage(wrappedMessage).queue(RestAction.getDefaultSuccess(), error -> event.getHook().sendMessage("Something bad happened, couldn't format"));
-	}
+    @Override
+    public void executeContextCommand(MessageContextInteractionEvent event) {
+        event.deferReply().queue();
+        if (!event.getName().equals("Format")) return;
+        String wrappedMessage = String.format("```%s\n%s\n```", "java", event.getTarget().getContentRaw());
+        event.getHook().sendMessage(wrappedMessage).queue(RestAction.getDefaultSuccess(), error -> event.getHook().sendMessage("Something bad happened, couldn't format"));
+    }
 
-	@Override
-	public CommandData getContextCommandData() {
-		return contextCommandData;
-	}
+    @Override
+    public CommandData getContextCommandData() {
+        return contextCommandData;
+    }
 
-	@Override
-	public String getName() {
-		return "Format";
-	}
+    @Override
+    public String getName() {
+        return "Format";
+    }
 }

@@ -32,16 +32,16 @@ public class MemberInfoService {
     }
 
     public int getMonthThankCountByMemberId(long id) {
-        Optional<MemberInfo> info =  repository.findById(id);
-        if(info.isPresent()) {
+        Optional<MemberInfo> info = repository.findById(id);
+        if (info.isPresent()) {
             return info.get().getMonthThankCount();
         }
         return -1;
     }
 
     public int getAllTimeThankCountByMemberId(long id) {
-        Optional<MemberInfo> info =  repository.findById(id);
-        if(info.isPresent()) {
+        Optional<MemberInfo> info = repository.findById(id);
+        if (info.isPresent()) {
             return info.get().getTotalThankCount();
         }
         return -1;

@@ -4,14 +4,17 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 public interface SlashCommand {
-     void executeSlash(SlashCommandInteractionEvent event);
-     String getName();
-     SlashCommandData getSlashCommandData();
-     default int getDelay() {
-          return 0;
-     }
+    void executeSlash(SlashCommandInteractionEvent event);
 
-     default int getQuickLimit() {
-          return 1;
-     }
+    String getName();
+
+    SlashCommandData getSlashCommandData();
+
+    default int getDelay() {
+        return 0;
+    }
+
+    default int getQuickLimit() {
+        return 1;
+    }
 }

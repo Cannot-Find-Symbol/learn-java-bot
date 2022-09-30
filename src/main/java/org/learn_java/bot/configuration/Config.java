@@ -27,7 +27,7 @@ public class Config {
     @Value("${moderator.roleids}")
     private List<String> moderatorRoleIds;
 
-    private Map<String, String> roleCommands = new HashMap<>();
+    private final Map<String, String> roleCommands = new HashMap<>();
 
 
     public Config() {
@@ -37,23 +37,11 @@ public class Config {
         return discordKey;
     }
 
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
     public String getGuildId() {
         return guildId;
     }
 
-    public List<String> getModeratorRoleIds() {
-        return moderatorRoleIds;
-    }
-
-    @ConfigurationProperties(prefix="rolecommand")
+    @ConfigurationProperties(prefix = "rolecommand")
     @Bean
     public Map<String, String> getRoleCommands() {
         return this.roleCommands;

@@ -21,12 +21,12 @@ public class MemberStatTracker {
         this.userId = userId;
     }
 
-    public void trackMessageOrFilename(String message, long channelId){
-        if(!messageFrequencyTracker.containsKey(message) && !messageToChannelTracker.containsKey(message)) {
+    public void trackMessageOrFilename(String message, long channelId) {
+        if (!messageFrequencyTracker.containsKey(message) && !messageToChannelTracker.containsKey(message)) {
             uniqueConcurrentMessageCount++;
         }
 
-        if(uniqueConcurrentMessageCount >= UNIQUE_MESSAGES_DUMP_STATS_LIMIT) {
+        if (uniqueConcurrentMessageCount >= UNIQUE_MESSAGES_DUMP_STATS_LIMIT) {
             messageFrequencyTracker.clear();
             messageToChannelTracker.clear();
             uniqueConcurrentMessageCount = 0;

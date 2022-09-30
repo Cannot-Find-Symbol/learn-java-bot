@@ -6,6 +6,7 @@ import java.util.List;
 
 @Entity
 public class RoleGroup {
+    Boolean isUnique;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -14,12 +15,8 @@ public class RoleGroup {
     private Long guildId;
     private Long messageId;
     private Long channelId;
-
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "group", cascade = CascadeType.ALL)
     private List<MemberRole> roles = new ArrayList<>();
-
-
-    Boolean isUnique;
 
     public Long getId() {
         return id;

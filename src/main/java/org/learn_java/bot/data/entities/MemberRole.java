@@ -6,16 +6,12 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class MemberRole {
-    @Id
-    private Long id;
-
-    private String description;
-
-    private int ordinal;
-
     @ManyToOne
     RoleGroup group;
-
+    @Id
+    private Long id;
+    private String description;
+    private int ordinal;
 
     public Long getId() {
         return id;

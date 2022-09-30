@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Mapper {
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
     public Mapper() {
         this.mapper = new ModelMapper();
@@ -21,15 +21,15 @@ public class Mapper {
         return this.mapper;
     }
 
-    public SpamDTO mapToSpamDTO(Spam spam){
+    public SpamDTO mapToSpamDTO(Spam spam) {
         return mapper.map(spam, SpamDTO.class);
     }
 
-    public WarnDTO mapToWarnDTO(Warn warn){
+    public WarnDTO mapToWarnDTO(Warn warn) {
         return mapper.map(warn, WarnDTO.class);
     }
 
-    public InfoDTO mapToInfoDTO(Info info){
+    public InfoDTO mapToInfoDTO(Info info) {
         return mapper.map(info, InfoDTO.class);
     }
 

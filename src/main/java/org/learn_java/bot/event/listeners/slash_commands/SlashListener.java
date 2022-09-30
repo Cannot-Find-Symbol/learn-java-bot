@@ -29,9 +29,9 @@ public class SlashListener extends ListenerAdapter {
     }
 
     private void executeCommand(SlashCommandInteractionEvent event, SlashCommand command) {
-        if(event.getMember() == null) return;
+        if (event.getMember() == null) return;
         int delayUntilNextUse = delayHandler.secondsUntilNextUse(event.getMember().getIdLong(), command);
-        if(delayUntilNextUse > 0) {
+        if (delayUntilNextUse > 0) {
             event.deferReply(true).queue();
             event.getHook().sendMessage("That command is on cooldown for another " + delayUntilNextUse + " seconds").queue();
         } else {

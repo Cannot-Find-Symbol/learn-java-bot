@@ -19,67 +19,67 @@ import java.util.stream.Collectors;
 
 @Component
 public class Info extends Command {
-	private final InfoService service;
-	private final SlashCommandData commandData;
+    private final InfoService service;
+    private final SlashCommandData commandData;
 
-	public Info(InfoService service) {
-		super("info", CommandType.ANY);
-		this.service = service;
-		SubcommandData listSubcommand = new SubcommandData("list", "Lists all topics");
-		SubcommandData topicSubcommand = new SubcommandData("topic", "Information about a topic")
-				.addOption(OptionType.STRING, "topic", "chosen topic", true);
+    public Info(InfoService service) {
+        super("info", CommandType.ANY);
+        this.service = service;
+        SubcommandData listSubcommand = new SubcommandData("list", "Lists all topics");
+        SubcommandData topicSubcommand = new SubcommandData("topic", "Information about a topic")
+                .addOption(OptionType.STRING, "topic", "chosen topic", true);
 
-		this.commandData = Commands.slash(getName(), "Shows information about topic")
-				.addSubcommands(listSubcommand, topicSubcommand);
-	}
+        this.commandData = Commands.slash(getName(), "Shows information about topic")
+                .addSubcommands(listSubcommand, topicSubcommand);
+    }
 
-	@Override
-	public void executeSlash(SlashCommandInteractionEvent event) {
-		event.deferReply().queue();
-		switch(Objects.requireNonNull(event.getSubcommandName())) {
-			case "list" -> listTopics(event);
-			case "topic" -> sendTopic(event);
-			default -> event.getHook().sendMessage("That command was not found... weird").queue();
-		}
+    @Override
+    public void executeSlash(SlashCommandInteractionEvent event) {
+        event.deferReply().queue();
+        switch (Objects.requireNonNull(event.getSubcommandName())) {
+            case "list" -> listTopics(event);
+            case "topic" -> sendTopic(event);
+            default -> event.getHook().sendMessage("That command was not found... weird").queue();
+        }
 
-	}
+    }
 
-	public void sendTopic(SlashCommandInteractionEvent event) {
-		service.findById(Objects.requireNonNull(event.getOption("topic")).getAsString()).ifPresentOrElse(
-				topic -> event.getHook().sendMessage(topic.getMessage()).queue(),
-				() -> event.getHook().sendMessage("Sorry, couldn't find a topic by that name").queue());
-	}
+    public void sendTopic(SlashCommandInteractionEvent event) {
+        service.findById(Objects.requireNonNull(event.getOption("topic")).getAsString()).ifPresentOrElse(
+                topic -> event.getHook().sendMessage(topic.getMessage()).queue(),
+                () -> event.getHook().sendMessage("Sorry, couldn't find a topic by that name").queue());
+    }
 
-	public void listTopics(SlashCommandInteractionEvent event) {
-		List<String> topics = service.findAll().stream()
-				.map(InfoDTO::getTopic)
-				.collect(Collectors.toList());
+    public void listTopics(SlashCommandInteractionEvent event) {
+        List<String> topics = service.findAll().stream()
+                .map(InfoDTO::getTopic)
+                .collect(Collectors.toList());
 
-		event.getHook().sendMessageEmbeds(buildTopicsEmbed(topics)).queue();
-	}
+        event.getHook().sendMessageEmbeds(buildTopicsEmbed(topics)).queue();
+    }
 
-	private MessageEmbed buildTopicsEmbed(List<String> topics) {
-		EmbedBuilder builder = new EmbedBuilder();
-		StringBuilder sb = builder.getDescriptionBuilder();
+    private MessageEmbed buildTopicsEmbed(List<String> topics) {
+        EmbedBuilder builder = new EmbedBuilder();
+        StringBuilder sb = builder.getDescriptionBuilder();
 
-		builder.setTitle("List of topics");
+        builder.setTitle("List of topics");
 
-		int listNumber = 1;
-		for (String topic : topics) {
-			sb.append(buildTopicLine(listNumber++, topic));
-		}
+        int listNumber = 1;
+        for (String topic : topics) {
+            sb.append(buildTopicLine(listNumber++, topic));
+        }
 
-		builder.setDescription(sb.toString());
+        builder.setDescription(sb.toString());
 
-		return builder.build();
-	}
+        return builder.build();
+    }
 
-	private String buildTopicLine(int listNumber, String topic) {
-		return String.format("%4s %s%n", listNumber + ". ", topic);
-	}
+    private String buildTopicLine(int listNumber, String topic) {
+        return String.format("%4s %s%n", listNumber + ". ", topic);
+    }
 
-	@Override
-	public SlashCommandData getSlashCommandData() {
-		return this.commandData;
-	}
+    @Override
+    public SlashCommandData getSlashCommandData() {
+        return this.commandData;
+    }
 }

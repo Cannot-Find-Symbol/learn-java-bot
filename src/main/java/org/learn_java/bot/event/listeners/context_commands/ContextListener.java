@@ -10,18 +10,18 @@ import java.util.List;
 @Component
 public class ContextListener extends ListenerAdapter {
 
-	private final List<ContextCommand> commands;
+    private final List<ContextCommand> commands;
 
-	public ContextListener(List<ContextCommand> commands) {
-		this.commands = commands;
-	}
+    public ContextListener(List<ContextCommand> commands) {
+        this.commands = commands;
+    }
 
-	@Override
-	public void onMessageContextInteraction(MessageContextInteractionEvent event) {
-		String contextName = event.getName();
-		commands.stream()
-				.filter(c -> c.getName().equalsIgnoreCase(contextName))
-				.findFirst()
-				.ifPresent(value -> value.executeContextCommand(event));
-	}
+    @Override
+    public void onMessageContextInteraction(MessageContextInteractionEvent event) {
+        String contextName = event.getName();
+        commands.stream()
+                .filter(c -> c.getName().equalsIgnoreCase(contextName))
+                .findFirst()
+                .ifPresent(value -> value.executeContextCommand(event));
+    }
 }
