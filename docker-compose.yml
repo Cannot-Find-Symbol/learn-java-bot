@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: ./Dockerfile_bot
     env_file:
-        - bot.env.example
+        - bot.env
     depends_on:
       - "database"
     entrypoint: "wait-for-it database:3306 -- java -jar lj-bot-1.0-SNAPSHOT.jar"
@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
   database:
     image: mariadb:latest
-    ports:
+    expose:
       - "3306"
     environment:
       - MARIADB_ROOT_PASSWORD=test

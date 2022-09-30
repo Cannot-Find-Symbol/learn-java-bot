@@ -131,6 +131,7 @@ buildNumber.properties
 
 #config
 *.properties
+*.env
 
 #database
 *.sqlite
