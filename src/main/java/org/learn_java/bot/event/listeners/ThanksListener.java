@@ -104,7 +104,7 @@ public class ThanksListener extends ListenerAdapter {
                 .map(Message::getMember)
                 .filter(Objects::nonNull)
                 .filter(this::isNotBot)
-                //.filter(member -> isNotSelf(event, member))
+                .filter(member -> isNotSelf(event, member))
                 .distinct()
                 .collect(Collectors.toList());
     }
