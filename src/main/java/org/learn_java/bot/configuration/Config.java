@@ -15,14 +15,8 @@ public class Config {
     @Value("${discord.key}")
     private String discordKey;
 
-    @Value("${bot.ownerid}")
-    private String owner;
-
     @Value("${guild.id}")
     private String guildId;
-
-    @Value("${moderator.roleids}")
-    private List<String> moderatorRoleIds;
 
     private final Map<String, String> roleCommands = new HashMap<>();
 

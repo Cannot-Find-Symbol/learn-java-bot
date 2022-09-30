@@ -2,7 +2,6 @@ package org.learn_java.bot.event.listeners;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -12,11 +11,11 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.learn_java.bot.BotInitializer;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.service.MemberInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.Nonnull;
@@ -37,15 +36,17 @@ public class ThanksListener extends ListenerAdapter {
     private final MemberInfoService service;
     private final Map<Long, LocalDateTime> recentlyUsedByMembers;
 
+    private final String helpChannelId;
 
-    public ThanksListener(MemberInfoService service) {
+
+    public ThanksListener(MemberInfoService service, @Value("${help.channelid}") String helpChannelId) {
         this.service = service;
         this.recentlyUsedByMembers = Collections.synchronizedMap(new HashMap<>());
+        this.helpChannelId = helpChannelId;
     }
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        logger.info("Message found of type {}", event.getMessage().getChannelType().toString());
         if (shouldIgnoreThank(event)) {
             return;
         }
@@ -53,7 +54,7 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     private boolean shouldIgnoreThank(@NotNull MessageReceivedEvent event) {
-        return !event.getChannelType().isThread() || event.getAuthor().isBot() || event.getMember() == null || !containsThanks(event) || recentlyUsed(event);
+        return !event.getChannelType().isThread() || !event.getChannel().asThreadChannel().getParentChannel().getId().equals(helpChannelId) || event.getAuthor().isBot() || event.getMember() == null || !containsThanks(event) || recentlyUsed(event);
     }
 
     private void sendMemberList(@NotNull MessageReceivedEvent event, List<Member> members) {
