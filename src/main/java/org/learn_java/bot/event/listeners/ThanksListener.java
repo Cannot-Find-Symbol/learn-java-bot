@@ -1,9 +1,8 @@
 package org.learn_java.bot.event.listeners;
 
-
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.service.MemberInfoService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.Nonnull;
@@ -30,18 +28,14 @@ import java.util.stream.Collectors;
 @org.springframework.stereotype.Component
 public class ThanksListener extends ListenerAdapter {
 
+    private static final ErrorHandler errorHandler = new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE);
     private final MemberInfoService service;
     private final Map<Long, LocalDateTime> recentlyUsedByMembers;
-    private final Set<String> blacklistedChannels;
-
-    private static final ErrorHandler errorHandler = new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE);
 
 
-    public ThanksListener(MemberInfoService service,
-                          @Value("${thanks.blacklisted.channels}") Set<String> blacklistedChannels) {
+    public ThanksListener(MemberInfoService service) {
         this.service = service;
         this.recentlyUsedByMembers = Collections.synchronizedMap(new HashMap<>());
-        this.blacklistedChannels = blacklistedChannels;
     }
 
     @Override
@@ -53,7 +47,7 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     private boolean shouldIgnoreThank(@NotNull MessageReceivedEvent event) {
-        return event.getChannelType() != ChannelType.TEXT || event.getAuthor().isBot() || event.getMember() == null || blacklistedChannels.contains(event.getChannel().getId()) || !containsThanks(event) || recentlyUsed(event);
+        return event.getChannelType() != ChannelType.FORUM || event.getAuthor().isBot() || event.getMember() == null || !containsThanks(event) || recentlyUsed(event);
     }
 
     private void sendMemberList(@NotNull MessageReceivedEvent event, List<Member> members) {
@@ -75,7 +69,7 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     private boolean containsThanks(@NotNull MessageReceivedEvent event) {
-       String message = event.getMessage().getContentRaw().toLowerCase();
+        String message = event.getMessage().getContentRaw().toLowerCase();
         return message.contains("thanks") || message.contains("thank you");
     }
 
@@ -145,7 +139,7 @@ public class ThanksListener extends ListenerAdapter {
             recentlyUsedByMembers.put(Objects.requireNonNull(event.getMember()).getIdLong(), LocalDateTime.now());
             Objects.requireNonNull(event.getGuild()).retrieveMemberById(id).queue((member) -> {
                 MemberInfo info = service.updateThankCountForMember(member.getIdLong());
-                event.getHook().editOriginal(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)").setActionRows(Collections.emptyList()).queue(null, errorHandler);
+                event.getHook().editOriginal(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)").setActionRow(Collections.emptyList()).queue(null, errorHandler);
             });
         }
     }

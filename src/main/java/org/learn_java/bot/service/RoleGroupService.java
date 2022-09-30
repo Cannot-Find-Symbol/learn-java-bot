@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public class RoleGroupService {
 
-    private RoleGroupRepository repository;
+    private final RoleGroupRepository repository;
 
     public RoleGroupService(RoleGroupRepository repository) {
         this.repository = repository;

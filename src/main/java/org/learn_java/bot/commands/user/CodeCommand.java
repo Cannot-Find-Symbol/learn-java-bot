@@ -1,22 +1,21 @@
 package org.learn_java.bot.commands.user;
 
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@ConditionalOnProperty(value = "code.enabled", havingValue = "true", matchIfMissing = true)
 public class CodeCommand extends Command {
 
-    private final Message message;
+    private final MessageCreateData message;
     private final SlashCommandData commandData;
 
     public CodeCommand() {
@@ -25,14 +24,14 @@ public class CodeCommand extends Command {
         this.commandData = Commands.slash(getName(), "sends code block message");
     }
 
-    private Message buildMessage() {
-        MessageBuilder builder = new MessageBuilder();
-        builder.append("\nPlease format your code using the following format\n");
-        builder.append("\\`\\`\\`java\n");
-        builder.append("//your code");
-        builder.append("\n\\`\\`\\`");
-        builder.append("\n Which will result in a code block such as");
-        builder.appendCodeBlock("int x = 3;\nSystem.out.println(x);", "java");
+    private MessageCreateData buildMessage() {
+        MessageCreateBuilder builder = new MessageCreateBuilder();
+        builder.addContent("\nPlease format your code using the following format\n");
+        builder.addContent("\\`\\`\\`java\n");
+        builder.addContent("//your code");
+        builder.addContent("\n\\`\\`\\`");
+        builder.addContent("\n Which will result in a code block such as");
+        builder.addContent(MarkdownUtil.codeblock("java", "int x = 3;\nSystem.out.println(x);"));
         return builder.build();
     }
 

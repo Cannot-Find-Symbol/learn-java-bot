@@ -1,14 +1,14 @@
 package org.learn_java.bot.event.listeners;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.learn_java.bot.data.entities.MemberRole;
 import org.learn_java.bot.data.entities.RoleGroup;
 import org.learn_java.bot.service.RoleGroupService;
@@ -21,16 +21,16 @@ import java.util.stream.Collectors;
 
 @Component
 public class RoleListener extends ListenerAdapter implements Startup {
-    private RoleGroupService service;
-    private JDA jda;
+    private final RoleGroupService service;
+    private final JDA jda;
 
     public RoleListener(RoleGroupService service, JDA jda) {
         this.service = service;
         this.jda = jda;
     }
 
-    private Message createRoleMessage(List<Role> roles, RoleGroup group) {
-        MessageBuilder builder = new MessageBuilder();
+    private MessageCreateData createRoleMessage(List<Role> roles, RoleGroup group) {
+        MessageCreateBuilder builder = new MessageCreateBuilder();
         SelectMenu.Builder menuBuilder = SelectMenu.create("rolegroup" + ":" + group.getId());
         Map<Long, Role> discordRoles = findGroupRoles(group, roles);
 
@@ -44,7 +44,7 @@ public class RoleListener extends ListenerAdapter implements Startup {
         });
 
         builder.setContent(group.getMessage() == null ? "test" : group.getMessage());
-        builder.setActionRows(ActionRow.of(menuBuilder.build()));
+        builder.setActionRow(menuBuilder.build());
 
         return builder.build();
     }
@@ -90,13 +90,13 @@ public class RoleListener extends ListenerAdapter implements Startup {
         groups.forEach(group -> {
             List<Role> roles = jda.getGuildById(group.getGuildId()).getRoles();
             TextChannel roleChannel = jda.getGuildById(group.getGuildId()).getTextChannelById(group.getChannelId());
-            Message message = createRoleMessage(roles, group);
+            MessageCreateData message = createRoleMessage(roles, group);
             if (group.getMessageId() == null) {
                 roleChannel.sendMessage(message).queue((success) -> updateMessageInformation(success.getIdLong(), group));
             } else {
                 roleChannel.retrieveMessageById(group.getMessageId())
-                        .queue((succuess) -> succuess.editMessage(message).queue()
-                                ,(fail) -> roleChannel.sendMessage(message).queue(succ -> {
+                        .queue((succuess) -> succuess.editMessage(MessageEditData.fromCreateData(message)).queue()
+                                , (fail) -> roleChannel.sendMessage(message).queue(succ -> {
                                     System.out.println("here");
                                     group.setMessageId(succ.getIdLong());
                                     service.save(group);

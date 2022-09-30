@@ -4,7 +4,6 @@ import org.learn_java.bot.configuration.Mapper;
 import org.learn_java.bot.data.dtos.InfoDTO;
 import org.learn_java.bot.data.entities.Info;
 import org.learn_java.bot.data.repositories.InfoRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@ConditionalOnProperty(value = "info.enabled", havingValue = "true", matchIfMissing = true)
 public class InfoService {
 
     private final InfoRepository repository;
@@ -23,13 +21,13 @@ public class InfoService {
         this.mapper = mapper;
     }
 
-    public List<InfoDTO> findAll(){
+    public List<InfoDTO> findAll() {
         return repository.findAll().stream()
                 .map(mapper::mapToInfoDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<Info> findById(String id){
+    public Optional<Info> findById(String id) {
         return repository.findById(id);
     }
 
@@ -37,7 +35,7 @@ public class InfoService {
         return mapper.mapToInfoDTO(repository.save(info));
     }
 
-    public boolean existsById(String id){
+    public boolean existsById(String id) {
         return repository.existsById(id);
     }
 
