@@ -14,8 +14,6 @@ services:
       - spring.datasource.username=root
       - spring.datasource.password=test
     restart: unless-stopped
-    networks:
-      bot:
   database:
     image: mariadb:latest
     expose:
@@ -25,7 +23,3 @@ services:
       - MARIADB_DATABASE=LEARNJAVA
     volumes:
       - ./learn-java-db:/var/lib/mysql
-    networks:
-      bot:
-networks:
-  bot:
