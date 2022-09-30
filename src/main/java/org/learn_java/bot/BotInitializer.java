@@ -28,7 +28,7 @@ public class BotInitializer {
         JDA jda = null;
         try {
             jda = JDABuilder.createDefault(config.getDiscordKey())
-                    .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.MESSAGE_CONTENT)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .build();
             jda.awaitReady();

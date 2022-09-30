@@ -10,9 +10,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.learn_java.bot.BotInitializer;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.service.MemberInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.Nonnull;
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
 public class ThanksListener extends ListenerAdapter {
+    static final Logger logger = LoggerFactory.getLogger(ThanksListener.class);
 
     private static final ErrorHandler errorHandler = new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE);
     private final MemberInfoService service;
@@ -40,6 +45,7 @@ public class ThanksListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        logger.info("Message found of type {}", event.getMessage().getChannelType().toString());
         if (shouldIgnoreThank(event)) {
             return;
         }
@@ -47,7 +53,7 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     private boolean shouldIgnoreThank(@NotNull MessageReceivedEvent event) {
-        return event.getChannelType() != ChannelType.FORUM || event.getAuthor().isBot() || event.getMember() == null || !containsThanks(event) || recentlyUsed(event);
+        return !event.getChannelType().isThread() || event.getAuthor().isBot() || event.getMember() == null || !containsThanks(event) || recentlyUsed(event);
     }
 
     private void sendMemberList(@NotNull MessageReceivedEvent event, List<Member> members) {
@@ -97,7 +103,7 @@ public class ThanksListener extends ListenerAdapter {
                 .map(Message::getMember)
                 .filter(Objects::nonNull)
                 .filter(this::isNotBot)
-                .filter(member -> isNotSelf(event, member))
+                //.filter(member -> isNotSelf(event, member))
                 .distinct()
                 .collect(Collectors.toList());
     }
@@ -139,7 +145,10 @@ public class ThanksListener extends ListenerAdapter {
             recentlyUsedByMembers.put(Objects.requireNonNull(event.getMember()).getIdLong(), LocalDateTime.now());
             Objects.requireNonNull(event.getGuild()).retrieveMemberById(id).queue((member) -> {
                 MemberInfo info = service.updateThankCountForMember(member.getIdLong());
-                event.getHook().editOriginal(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)").setActionRow(Collections.emptyList()).queue(null, errorHandler);
+                MessageEditBuilder builder = new MessageEditBuilder();
+                builder.setContent(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)");
+                builder.setComponents(Collections.emptyList());
+                event.getHook().editOriginal(builder.build()).queue(null, errorHandler);
             });
         }
     }

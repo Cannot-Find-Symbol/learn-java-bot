@@ -15,9 +15,6 @@ public class Config {
     @Value("${discord.key}")
     private String discordKey;
 
-    @Value("${bot.prefix}")
-    private String prefix;
-
     @Value("${bot.ownerid}")
     private String owner;
 
