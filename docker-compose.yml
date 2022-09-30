@@ -13,8 +13,6 @@ services:
       - spring.datasource.url=jdbc:mariadb://database:3306/LEARNJAVA
       - spring.datasource.username=root
       - spring.datasource.password=test
-    volumes:
-      - learn-java-config:/etc/learn-java-bot
     restart: unless-stopped
   database:
     image: mariadb:latest
@@ -24,7 +22,4 @@ services:
       - MARIADB_ROOT_PASSWORD=test
       - MARIADB_DATABASE=LEARNJAVA
     volumes:
-      - learn-java-db
-volumes:
-  learn-java-config:
-  learn-java-db:
+      - ./learn-java-db:/var/lib/mysql

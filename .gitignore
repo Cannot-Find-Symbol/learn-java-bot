@@ -135,4 +135,5 @@ buildNumber.properties
 
 #database
 *.sqlite
+/learn-java-db
 # End of https://www.gitignore.io/api/java,maven,intellij
