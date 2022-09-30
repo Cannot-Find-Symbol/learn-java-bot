@@ -6,16 +6,13 @@
 This is the server bot for the learn-java discord. This bot is free to be worked on by anyone, and if you'd like to join and helpout click the discord shield above.
 
 #Requirements
-* JDK 11 or newer
-* Maven
-* Git
-* MariaDB
+* Docker
+* docker-compose
 
 
 #Setup
 
 1. Clone the repo ```git clone https://github.com/Cannot-Find-Symbol/learn-java-bot.git```
-2. Install MariaDB and setup a database for the bot to use
-3. edit application.properties.example in `src\main\resources` and rename to application.properties
-4. run the bot using `mvn spring-boot:run`, if you wish to package it run `mvn package` and execute using `java -jar jarfile`
+2. Copy bot.env.example to bot.env and configure the discord key and channelids
+3. Start the bot with ```docker-compose up -d```
 
