@@ -97,7 +97,6 @@ public class RoleListener extends ListenerAdapter implements Startup {
                 roleChannel.retrieveMessageById(group.getMessageId())
                         .queue((succuess) -> succuess.editMessage(MessageEditData.fromCreateData(message)).queue()
                                 , (fail) -> roleChannel.sendMessage(message).queue(succ -> {
-                                    System.out.println("here");
                                     group.setMessageId(succ.getIdLong());
                                     service.save(group);
                                 }));

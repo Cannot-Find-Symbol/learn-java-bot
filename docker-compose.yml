@@ -16,8 +16,8 @@ services:
     restart: unless-stopped
   database:
     image: mariadb:latest
-    expose:
-      - "3306"
+    ports:
+      - "3306:3306"
     environment:
       - MARIADB_ROOT_PASSWORD=test
       - MARIADB_DATABASE=LEARNJAVA

@@ -45,11 +45,11 @@ public class BotConfiguration {
 
         jda.addEventListener((Object[]) listeners);
         startups.forEach(Startup::startup);
-        CommandListUpdateAction commands = jda.updateCommands();
 
         Objects.requireNonNull(jda.getGuildById(config.getGuildId()))
                 .updateCommands()
                 .addCommands(slash)
-                .addCommands(context);
+                .addCommands(context)
+                .queue();
     }
 }

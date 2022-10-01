@@ -27,10 +27,12 @@ public class Infomaster extends Command {
 
         SubcommandData fromContent = new SubcommandData("from-content", "add topic from content option")
                 .addOption(OptionType.STRING, "topic", "chosen topic", true)
-                .addOption(OptionType.STRING, "content", "topic content", true);
+                .addOption(OptionType.STRING, "content", "topic content", true)
+                .addOption(OptionType.STRING, "description", "topic description", false);
         SubcommandData fromMessage = new SubcommandData("from-message", "add topic from message")
                 .addOption(OptionType.STRING, "topic", "chosen topic", true)
-                .addOption(OptionType.STRING, "message-id", "message to use", true);
+                .addOption(OptionType.STRING, "message-id", "message to use", true)
+                .addOption(OptionType.STRING, "description", "topic description", false);
         SubcommandData delete = new SubcommandData("delete", "delete topic")
                 .addOption(OptionType.STRING, "topic", "chosen topic", true);
         SubcommandGroupData add = new SubcommandGroupData("add", "add topic from content option")
@@ -67,21 +69,30 @@ public class Infomaster extends Command {
     private void handleAddFromContent(SlashCommandInteractionEvent event) {
         String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
         String content = Objects.requireNonNull(event.getOption("content")).getAsString();
-        saveMessage(topic, content, event);
+        String description = Objects.requireNonNull(event.getOption("description")).getAsString();
+        saveMessage(topic, content, description, event);
+        updateCommands(event, topic, description);
+    }
+
+    private static void updateCommands(SlashCommandInteractionEvent event, String topic, String description) {
+        SlashCommandData data = Commands.slash(topic, description);
+        event.getJDA().updateCommands().addCommands(data).queue();
     }
 
     private void handleAddFromMessage(SlashCommandInteractionEvent event) {
         String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
         String messageId = Objects.requireNonNull(event.getOption("message-id")).getAsString();
-        event.getChannel().retrieveMessageById(messageId).queue((message) -> saveMessage(topic, message.getContentRaw(), event), (e) -> sendReply(event, "Failed to save, possibly message id was bad?"));
+        String description = Objects.requireNonNull(event.getOption("description")).getAsString();
+        event.getChannel().retrieveMessageById(messageId).queue((message) -> saveMessage(topic, message.getContentRaw(), description, event), (e) -> sendReply(event, "Failed to save, possibly message id was bad?"));
+        updateCommands(event, topic, description);
     }
 
     private void sendReply(SlashCommandInteractionEvent event, String content) {
         event.getHook().sendMessage(content).queue();
     }
 
-    private void saveMessage(String topic, String message, SlashCommandInteractionEvent event) {
-        service.save(new Info(topic, message));
+    private void saveMessage(String topic, String message, String description, SlashCommandInteractionEvent event) {
+        service.save(new Info(topic, message, description));
         sendReply(event, "Successfully saved");
     }
 
@@ -95,9 +106,11 @@ public class Infomaster extends Command {
     private void handleUpdateFromContent(SlashCommandInteractionEvent event) {
         String topic = Objects.requireNonNull(event.getOption("topic")).getAsString();
         String content = Objects.requireNonNull(event.getOption("content")).getAsString();
+        String description = Objects.requireNonNull(event.getOption("description")).getAsString();
         service.findById(topic).ifPresentOrElse(
                 (info) -> update(content, info, event),
                 () -> sendReply(event, "Sorry, can't find topic by that name"));
+        updateCommands(event, topic, description);
     }
 
     private void handleUpdateFromMessage(SlashCommandInteractionEvent event) {
@@ -106,6 +119,8 @@ public class Infomaster extends Command {
         event.getChannel().retrieveMessageById(messageId).queue(
                 (message) -> updateFromFoundMessage(event, topic, message),
                 (error) -> sendReply(event, "Failed to save, possibly message id was bad?"));
+        String description = Objects.requireNonNull(event.getOption("description")).getAsString();
+        updateCommands(event, topic, description);
     }
 
     private void updateFromFoundMessage(SlashCommandInteractionEvent event, String topic, Message message) {
@@ -129,6 +144,7 @@ public class Infomaster extends Command {
         } else {
             service.deleteById(topic);
             sendReply(event, "Successfully deleted");
+            event.getJDA().retrieveCommands().queue((commands) -> commands.stream().filter(command -> command.getName().equals(topic)).forEach(c -> c.delete().queue()));
         }
     }
 

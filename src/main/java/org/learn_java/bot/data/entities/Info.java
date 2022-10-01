@@ -10,12 +10,15 @@ public class Info {
     private String topic;
     private String message;
 
+    private String description;
+
     public Info() {
     }
 
-    public Info(String topic, String message) {
+    public Info(String topic, String message, String description) {
         this.topic = topic;
         this.message = message;
+        this.description = description;
     }
 
     public String getTopic() {
@@ -32,5 +35,13 @@ public class Info {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -4,6 +4,8 @@ public class InfoDTO {
     private String topic;
     private String message;
 
+    private String description;
+
     public InfoDTO() {
     }
 
@@ -21,5 +23,13 @@ public class InfoDTO {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
