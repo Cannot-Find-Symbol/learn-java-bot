@@ -49,8 +49,10 @@ public class WhoisCommand extends Command {
         builder.addField("Time On Server", DurationFormatUtils.formatDurationWords(timeOnServer.toMillis(), true, true),
                 false);
         MemberInfo info = memberInfoService.findById(member.getIdLong());
-        builder.addField("Current Month Thanks", String.valueOf(info.getMonthThankCount()), false);
-        builder.addField("All Time Thanks", String.valueOf(info.getTotalThankCount()), false);
+        if(info != null) {
+            builder.addField("Current Month Thanks", String.valueOf(info.getMonthThankCount()), false);
+            builder.addField("All Time Thanks", String.valueOf(info.getTotalThankCount()), false);
+        }
         return builder.build();
     }
 
