@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -44,7 +45,9 @@ public class Leaderboard implements SlashCommand {
         SubcommandData month = new SubcommandData("month", "view leaderboard for current month");
         SubcommandData allTime = new SubcommandData("alltime", "view leaderboard for current month");
         this.commandData = Commands.slash(name, "Show thanks leaderboard")
-                .addSubcommands(month, allTime);
+                .addSubcommands(month, allTime)
+                .setGuildOnly(true)
+                .setDefaultPermissions(DefaultMemberPermissions.ENABLED);
     }
 
     @Override

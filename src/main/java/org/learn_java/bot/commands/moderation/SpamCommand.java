@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-@ConditionalOnProperty(value = "spam.enabled", havingValue = "true", matchIfMissing = true)
 public class SpamCommand extends Command {
     private final SpamService service;
     private final SlashCommandData commandData;

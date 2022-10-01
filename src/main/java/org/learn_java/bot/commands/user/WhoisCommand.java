@@ -24,7 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @Component
-@ConditionalOnProperty(value = "whois.enabled", havingValue = "true", matchIfMissing = true)
 public class WhoisCommand extends Command {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-@ConditionalOnProperty(value = "warn.enabled", havingValue = "true", matchIfMissing = true)
 public class WarnCommand extends Command {
 
     private final WarnService service;
