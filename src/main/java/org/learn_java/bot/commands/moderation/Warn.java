@@ -13,9 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
 import org.learn_java.bot.data.dtos.WarnDTO;
-import org.learn_java.bot.data.entities.Warn;
 import org.learn_java.bot.service.WarnService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -23,13 +21,13 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class WarnCommand extends Command {
+public class Warn extends Command {
 
     private final WarnService service;
     private final SlashCommandData commandData;
 
 
-    public WarnCommand(WarnService service) {
+    public Warn(WarnService service) {
         super("warn", CommandType.MODERATOR);
         SubcommandData show = new SubcommandData("show", "show warns for user")
                 .addOption(OptionType.MENTIONABLE, "member", "member", true);
@@ -53,8 +51,8 @@ public class WarnCommand extends Command {
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 
-    private Warn createWarn(User user, String reason) {
-        return new Warn(user.getAsTag(), reason, LocalDate.now());
+    private org.learn_java.bot.data.entities.Warn createWarn(User user, String reason) {
+        return new org.learn_java.bot.data.entities.Warn(user.getAsTag(), reason, LocalDate.now());
     }
 
     @Override

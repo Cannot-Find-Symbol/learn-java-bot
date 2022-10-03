@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class SayCommand extends Command {
+public class Say extends Command {
     private final SlashCommandData slashCommandData;
 
-    public SayCommand() {
+    public Say() {
         super("say", CommandType.MODERATOR);
         slashCommandData = Commands.slash("say", "Say something")
                 .addOption(OptionType.STRING, "message", "message", true)

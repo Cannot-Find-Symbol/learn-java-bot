@@ -6,19 +6,13 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.learn_java.bot.commands.ContextCommand;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
-
 @Component
-public class FormatCommand implements ContextCommand {
-
-    private static final BigInteger MAX_MESSAGE_ID = new BigInteger(String.valueOf(Long.MAX_VALUE));
+public class Format implements ContextCommand {
     private final CommandData contextCommandData;
 
-    public FormatCommand() {
+    public Format() {
         contextCommandData = Commands.context(Command.Type.MESSAGE, "Format");
     }
 
@@ -27,7 +21,7 @@ public class FormatCommand implements ContextCommand {
         event.deferReply().queue();
         if (!event.getName().equals("Format")) return;
         String wrappedMessage = String.format("```%s\n%s\n```", "java", event.getTarget().getContentRaw());
-        event.getHook().sendMessage(wrappedMessage).queue(RestAction.getDefaultSuccess(), error -> event.getHook().sendMessage("Something bad happened, couldn't format"));
+        event.getHook().sendMessage(wrappedMessage).queue(RestAction.getDefaultSuccess(), error -> event.getHook().sendMessage("Something bad happened, couldn't format").queue());
     }
 
     @Override

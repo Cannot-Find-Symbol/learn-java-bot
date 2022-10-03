@@ -14,8 +14,6 @@ import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.service.MemberInfoService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -24,13 +22,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @Component
-public class WhoisCommand extends Command {
+public class Whois extends Command {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final SlashCommandData commandData;
     private final MemberInfoService memberInfoService;
 
-    public WhoisCommand(MemberInfoService memberInfoService) {
+    public Whois(MemberInfoService memberInfoService) {
         super("whois", CommandType.ANY);
         this.memberInfoService = memberInfoService;
         this.commandData = Commands.slash(getName(), "Show information about member")

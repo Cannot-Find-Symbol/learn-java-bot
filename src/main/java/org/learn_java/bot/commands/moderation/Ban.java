@@ -16,10 +16,10 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class BanCommand extends Command {
+public class Ban extends Command {
     private final SlashCommandData commandData;
 
-    public BanCommand() {
+    public Ban() {
         super("ban", CommandType.MODERATOR);
         this.commandData = Commands.slash(getName(), "bans user")
                 .addOption(OptionType.USER, "member", "member to ban", true)

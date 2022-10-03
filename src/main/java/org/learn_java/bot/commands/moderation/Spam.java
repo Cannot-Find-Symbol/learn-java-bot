@@ -9,19 +9,17 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
-import org.learn_java.bot.data.entities.Spam;
 import org.learn_java.bot.service.SpamService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
-public class SpamCommand extends Command {
+public class Spam extends Command {
     private final SpamService service;
     private final SlashCommandData commandData;
 
-    public SpamCommand(SpamService service) {
+    public Spam(SpamService service) {
         super("spam", CommandType.MODERATOR);
         this.commandData = Commands.slash("spam", "adds message to spam list")
                 .addOption(OptionType.STRING, "message", "message to add")
@@ -40,7 +38,7 @@ public class SpamCommand extends Command {
 
         String message = Objects.requireNonNull(event.getOption("message")).getAsString().trim();
         if (service.findMessage(message) == null) {
-            service.save(new Spam(message));
+            service.save(new org.learn_java.bot.data.entities.Spam(message));
             event.getHook().sendMessage("Message added").queue();
         } else {
             event.getHook().sendMessage("That message already exists").queue();
