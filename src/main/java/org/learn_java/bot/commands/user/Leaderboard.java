@@ -10,7 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.learn_java.bot.commands.SlashCommand;
+import org.learn_java.bot.commands.Command;
+import org.learn_java.bot.commands.CommandType;
 import org.learn_java.bot.commands.user.run.MemberInfoDTO;
 import org.learn_java.bot.configuration.Config;
 import org.learn_java.bot.data.entities.MemberInfo;
@@ -26,9 +27,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class Leaderboard implements SlashCommand {
+public class Leaderboard extends Command {
     private final SlashCommandData commandData;
-    private final String name;
     private final MemberInfoService service;
     private final String leaderboardChannelId;
     private final JDA jda;
@@ -36,7 +36,7 @@ public class Leaderboard implements SlashCommand {
 
     public Leaderboard(MemberInfoService service,
                        @Value("${leaderboard.channelid}") String leaderboardChannelId, JDA jda, Config config) {
-        this.name = "leaderboard";
+        super("leaderboard", CommandType.ANY);
         this.service = service;
         this.leaderboardChannelId = leaderboardChannelId;
         this.jda = jda;
@@ -44,7 +44,7 @@ public class Leaderboard implements SlashCommand {
 
         SubcommandData month = new SubcommandData("month", "view leaderboard for current month");
         SubcommandData allTime = new SubcommandData("alltime", "view leaderboard for current month");
-        this.commandData = Commands.slash(name, "Show thanks leaderboard")
+        this.commandData = Commands.slash(getName(), "Show thanks leaderboard")
                 .addSubcommands(month, allTime)
                 .setGuildOnly(true)
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED);
@@ -173,11 +173,6 @@ public class Leaderboard implements SlashCommand {
 
     public MemberInfo getThankCount(List<MemberInfo> memberInfos, long id) {
         return memberInfos.stream().filter(member -> member.getId().equals(id)).findFirst().orElse(null);
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
