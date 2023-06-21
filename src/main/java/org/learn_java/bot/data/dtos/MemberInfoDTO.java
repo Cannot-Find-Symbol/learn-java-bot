@@ -1,4 +1,4 @@
-package org.learn_java.bot.commands.user.run;
+package org.learn_java.bot.data.dtos;
 
 import net.dv8tion.jda.api.entities.Member;
 

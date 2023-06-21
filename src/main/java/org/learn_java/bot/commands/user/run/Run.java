@@ -154,7 +154,6 @@ public class Run implements ContextCommand {
             event.getInteraction().getTargetType();
             sendResponseToChannel(event.getTarget(), event.getHook());
         }
-        event.getHook().sendMessage("Had an issue with this command").queue();
     }
 
     @Override
