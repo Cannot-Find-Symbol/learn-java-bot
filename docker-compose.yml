@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   bot:
-    image: ghcr.io/cannot-find-symbol/learn-java-bot:main
+    image: ghcr.io/cannot-find-symbol/learn-java-bot:master
     env_file:
         - bot.env
     depends_on:
