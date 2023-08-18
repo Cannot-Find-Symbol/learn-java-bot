@@ -30,6 +30,7 @@ public class SpamListener extends ListenerAdapter {
     private static final int REMOVE_HISTORY_DAYS = 1;
     private static final String REASON = "Matched spam filter";
     private final static String BAN_REASON = "User flooded chat";
+    public static final String WARN_MESSAGE = "You just hit the rate limit. You've sent too many repeated messages either across channels, or to one channel. Next repeated message will result in a ban ";
 
     private final String loggingChannelId;
     private final SpamRepository repository;
@@ -74,29 +75,30 @@ public class SpamListener extends ListenerAdapter {
         tracker.trackMessageOrFilename(message, channel.getIdLong());
 
         if (tracker.isWarned() && tracker.messageIsInViolation(message)) {
-            banMember(member);
+            banMember(member, message);
             trackers.remove(member.getUser().getIdLong());
         }
 
         if (tracker.memberShouldBeWarned() && !tracker.isWarned()) {
-            MessageCreateBuilder builder = new MessageCreateBuilder();
-            builder.setContent("You just hit the rate limit. You've sent too many repeated messages either across channels, or to one channel. Next repeated message will result in a ban ");
-            builder.mention(member.getUser());
+            MessageCreateBuilder builder = new MessageCreateBuilder()
+                    .setContent(WARN_MESSAGE)
+                    .mention(member.getUser());
             channel.sendMessage(builder.build()).queue();
             tracker.setWarned(true);
         }
     }
 
-    private void banMember(Member member) {
+    private void banMember(Member member, String message) {
         if (!botHasPermissionToBan(member)) {
-            logToChannel("I didn't have the power to ban " + member.getEffectiveName() + " for flooding");
+            logToChannel("I didn't have the power to ban " + member.getEffectiveName() + " for flooding for message: ");
+            logToChannel(message);
             return;
         }
 
         member.getUser().openPrivateChannel().submit()
                 .thenAccept(c -> c.sendMessage(banAppealMessage).submit())
                 .whenComplete((s, error) -> member.ban(1, TimeUnit.DAYS).reason(BAN_REASON).submit())
-                .whenComplete((s, error) -> handleBanResult(member, error));
+                .whenComplete((s, error) -> handleBanResult(member, message, error));
     }
 
     private boolean botHasPermissionToBan(Member member) {
@@ -106,12 +108,12 @@ public class SpamListener extends ListenerAdapter {
         return memberHighestRole == null || botHighestRole.compareTo(memberHighestRole) > 0 || !member.getPermissions().contains(Permission.ADMINISTRATOR);
     }
 
-    private void handleBanResult(Member member, Throwable error) {
-        if (error == null) {
-            logToChannel(member.getEffectiveName() + " was banned for flooding");
-        } else {
-            logToChannel("An error occured while trying to ban " + member.getEffectiveName() + " for flooding");
-        }
+    private void handleBanResult(Member member, String message, Throwable error) {
+
+        String banMessageContent = error == null ? member.getEffectiveName() + " was banned for flooding for message: "
+                : "An error occured while trying to ban " + member.getEffectiveName() + " for flooding with message: ";
+        logToChannel(banMessageContent);
+        logToChannel(message);
     }
 
     private void logToChannel(String member) {
