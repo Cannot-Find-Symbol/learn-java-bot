@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  bot:
+    build:
+      context: ./  # Path to the directory containing the Dockerfile
+      dockerfile: Dockerfile  # Only necessary if the Dockerfile is named differently
+    env_file:
+      - bot.env
+    depends_on:
+      - "database"
+    entrypoint: "wait-for-it database:3306 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar lj-bot-1.0-SNAPSHOT.jar"
+    ports:
+      - "5005:5005"
+    environment:
+      - spring.datasource.url=jdbc:mariadb://database:3306/LEARNJAVA
+      - spring.datasource.username=root
+      - spring.datasource.password=test
+    restart: unless-stopped
+  database:
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    environment:
+      - MARIADB_ROOT_PASSWORD=test
+      - MARIADB_DATABASE=LEARNJAVA
+    volumes:
+      - ./learn-java-db:/var/lib/mysql
