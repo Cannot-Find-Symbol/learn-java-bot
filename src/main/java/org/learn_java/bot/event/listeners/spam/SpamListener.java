@@ -30,7 +30,7 @@ public class SpamListener extends ListenerAdapter {
     private static final int REMOVE_HISTORY_DAYS = 1;
     private static final String REASON = "Matched spam filter";
     private final static String BAN_REASON = "User flooded chat";
-    public static final String WARN_MESSAGE = "You just hit the rate limit. You've sent too many repeated messages either across channels, or to one channel. Next repeated message will result in a ban ";
+    public static final String WARN_MESSAGE = "You just hit the rate limit %s. You've sent too many repeated messages either across channels, or to one channel. Next repeated message will result in a ban ";
 
     private final String loggingChannelId;
     private final SpamRepository repository;
@@ -81,9 +81,8 @@ public class SpamListener extends ListenerAdapter {
 
         if (tracker.memberShouldBeWarned() && !tracker.isWarned()) {
             MessageCreateBuilder builder = new MessageCreateBuilder()
-                    .setContent(WARN_MESSAGE)
-                    .mention(member.getUser());
-            channel.sendMessage(builder.build()).queue();
+                    .setContent(String.format(WARN_MESSAGE, member.getUser().getAsMention()));
+            channel.sendMessage(builder.build()).queue((sentMessage) -> sentMessage.delete().queueAfter(1, TimeUnit.MINUTES));
             tracker.setWarned(true);
         }
     }
