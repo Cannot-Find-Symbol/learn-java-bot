@@ -2,12 +2,13 @@ package org.learn_java.bot.event.listeners;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import javax.annotation.Nonnull;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -46,11 +47,12 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (shouldIgnoreThank(event)) {
             return;
         }
-        getRecentlyTalkedMembers(event).thenAccept(members -> sendMemberList(event, members));
+        getRecentlyTalkedMembers(event)
+                .thenAccept(members -> sendMemberList(event, members));
     }
 
     private boolean shouldIgnoreThank(@NotNull MessageReceivedEvent event) {
@@ -60,10 +62,18 @@ public class ThanksListener extends ListenerAdapter {
     private void sendMemberList(@NotNull MessageReceivedEvent event, List<Member> members) {
         if (!members.isEmpty() && event.getMember() != null) {
             List<SelectOption> options = createMemberSelectOptions(members);
-            SelectOption dismiss = SelectOption.of("Nobody", "dismiss").withDescription("Select to dismiss this message");
+            SelectOption dismiss = SelectOption.of("Nobody", "dismiss")
+                    .withDescription("Select to dismiss this message");
+
             options.add(dismiss);
-            SelectMenu menu = SelectMenu.create("thanks" + ":" + event.getMember().getId()).addOptions(options).setPlaceholder("Member").build();
-            event.getChannel().sendMessage("It looks like you've thanked someone, who helped you?")
+
+            SelectMenu menu = StringSelectMenu.create("thanks" + ":" + event.getMember().getId())
+                    .addOptions(options)
+                    .setPlaceholder("Member")
+                    .build();
+
+            event.getChannel()
+                    .sendMessage("It looks like you've thanked someone, who helped you?")
                     .setActionRow(menu)
                     .queue(messageSentHandler(event));
         }
@@ -90,12 +100,17 @@ public class ThanksListener extends ListenerAdapter {
 
     @NotNull
     private List<SelectOption> createMemberSelectOptions(List<Member> members) {
-        return members.stream().map(member -> SelectOption.of(member.getEffectiveName(), member.getId())).collect(Collectors.toList());
+        return members.stream()
+                .map(member -> SelectOption.of(member.getEffectiveName(), member.getId()))
+                .collect(Collectors.toList());
     }
 
     @NotNull
     private CompletableFuture<List<Member>> getRecentlyTalkedMembers(@NotNull MessageReceivedEvent event) {
-        return event.getChannel().getIterableHistory().takeAsync(10).thenApply(messages -> filterMemberList(messages, event));
+        return event.getChannel()
+                .getIterableHistory()
+                .takeAsync(10)
+                .thenApply(messages -> filterMemberList(messages, event));
     }
 
     public List<Member> filterMemberList(List<Message> messages, MessageReceivedEvent event) {
@@ -126,10 +141,15 @@ public class ThanksListener extends ListenerAdapter {
     }
 
     @Override
-    public void onSelectMenuInteraction(@Nonnull SelectMenuInteractionEvent event) {
+    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
         String menuId = event.getComponentId();
-        if (!menuId.startsWith("thanks")) return;
+
+        if (!menuId.startsWith("thanks")) {
+            return;
+        }
+
         String memberId = event.getComponentId().split(":")[1];
+
         if (!Objects.requireNonNull(event.getMember()).getId().equals(memberId)) {
             event.reply("This interaction was not for you :) Sorry").setEphemeral(true).queue();
             return;
@@ -144,16 +164,24 @@ public class ThanksListener extends ListenerAdapter {
         if (event.isFromGuild()) {
             event.deferEdit().queue();
             recentlyUsedByMembers.put(Objects.requireNonNull(event.getMember()).getIdLong(), LocalDateTime.now());
-            Objects.requireNonNull(event.getGuild()).retrieveMemberById(id).queue((member) -> {
-                MemberInfo info = service.updateThankCountForMember(member.getIdLong());
-                MessageEditBuilder builder = new MessageEditBuilder();
-                builder.setContent(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)");
-                builder.setComponents(Collections.emptyList());
-                event.getHook().editOriginal(builder.build()).queue(null, errorHandler);
-            });
+
+            Objects.requireNonNull(event.getGuild())
+                    .retrieveMemberById(id)
+                    .queue(member -> updateThankCount(member, event));
         }
     }
 
+    private void updateThankCount(Member member, StringSelectInteractionEvent event) {
+
+        MemberInfo info = service.updateThankCountForMember(member.getIdLong());
+        MessageEditBuilder builder = new MessageEditBuilder();
+        builder.setContent(member.getEffectiveName() + " has been awarded a point! Now has a total of " + info.getTotalThankCount() + " point(s)");
+        builder.setComponents(Collections.emptyList());
+        event.getHook()
+                .editOriginal(builder.build())
+                .queue(null, errorHandler);
+
+    }
 
     @Scheduled(cron = "* */15 * * * *")
     public void purgeCache() {
