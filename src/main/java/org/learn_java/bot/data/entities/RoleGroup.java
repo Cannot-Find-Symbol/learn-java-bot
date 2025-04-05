@@ -1,6 +1,6 @@
 package org.learn_java.bot.data.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

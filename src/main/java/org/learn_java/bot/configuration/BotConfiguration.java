@@ -11,7 +11,7 @@ import org.learn_java.bot.commands.SlashCommand;
 import org.learn_java.bot.event.listeners.Startup;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Objects;
 
