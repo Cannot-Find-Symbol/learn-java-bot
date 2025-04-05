@@ -1,10 +1,10 @@
 package org.learn_java.bot.service;
 
+import jakarta.transaction.Transactional;
 import org.learn_java.bot.data.entities.MemberInfo;
 import org.learn_java.bot.data.repositories.MemberInfoRepository;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
