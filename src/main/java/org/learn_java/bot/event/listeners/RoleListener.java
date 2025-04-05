@@ -1,11 +1,12 @@
 package org.learn_java.bot.event.listeners;
 
+import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
@@ -14,8 +15,6 @@ import org.learn_java.bot.data.entities.RoleGroup;
 import org.learn_java.bot.service.RoleGroupService;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,9 @@ public class RoleListener extends ListenerAdapter implements Startup {
 
     private MessageCreateData createRoleMessage(List<Role> roles, RoleGroup group) {
         MessageCreateBuilder builder = new MessageCreateBuilder();
-        SelectMenu.Builder menuBuilder = SelectMenu.create("rolegroup" + ":" + group.getId());
+
+        StringSelectMenu.Builder menuBuilder =  StringSelectMenu.create("rolegroup" + ":" + group.getId());
+
         Map<Long, Role> discordRoles = findGroupRoles(group, roles);
 
         List<MemberRole> memberRoles = group.getRoles().stream()
@@ -62,7 +63,7 @@ public class RoleListener extends ListenerAdapter implements Startup {
     }
 
     @Override
-    public void onSelectMenuInteraction(@Nonnull SelectMenuInteractionEvent event) {
+    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
         String eventId = event.getComponentId();
         if (!eventId.startsWith("rolegroup")) return;
         event.deferReply(true).queue();
