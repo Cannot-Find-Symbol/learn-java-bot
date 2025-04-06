@@ -1,5 +1,6 @@
 package org.learn_java.bot.data.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -8,7 +9,10 @@ public class Info {
 
     @Id
     private String topic;
+
+    @Column(length = 2000)
     private String message;
+
 
     private String description;
 
