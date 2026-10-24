@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@DataJpaTest(showSql = false, properties = "spring.jpa.hibernate.ddl-auto=create-drop")
+@DataJpaTest(showSql = false, properties = "spring.jpa.hibernate.ddl-auto=validate")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({SpamService.class, Mapper.class})
 class SpamServiceTest extends MariaDbTestContainer {
