@@ -9,28 +9,31 @@ permissions:
   packages: write
 
 jobs:
-  test:
-    name: Build and test
-    uses: ./.github/workflows/build.yml
-    with:
-      upload_artifact: true
-    permissions:
-      contents: read
-
   version:
-    needs: test
     runs-on: ubuntu-24.04
     outputs:
       tag: ${{ steps.semver.outputs.version_tag }}
+      version: ${{ steps.semver.outputs.version }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - id: tags
-        run: echo "found=$(git tag --list 'v[0-9]*' | grep -q . && echo true || echo false)" >> "$GITHUB_OUTPUT"
       - uses: paulhatch/semantic-version@v5.4.0
         id: semver
-        if: steps.tags.outputs.found == 'true'
+        with:
+          major_pattern: '/!:|BREAKING CHANGE:/'
+          minor_pattern: '/feat(\(.+\))?:/'
+          search_commit_body: true
+
+  test:
+    name: Build and test
+    needs: version
+    uses: ./.github/workflows/build.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+      upload_artifact: true
+    permissions:
+      contents: read
 
   publish:
     needs: [test, version]
