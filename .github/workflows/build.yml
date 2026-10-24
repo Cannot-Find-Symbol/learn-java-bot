@@ -3,6 +3,9 @@ name: Build and test
 on:
   workflow_call:
     inputs:
+      version:
+        type: string
+        default: 1.0.1-SNAPSHOT
       upload_artifact:
         type: boolean
 
@@ -20,7 +23,7 @@ jobs:
           distribution: temurin
           java-version: '27'
           cache: maven
-      - run: mvn -B --no-transfer-progress clean verify
+      - run: mvn -B --no-transfer-progress -Drevision=${{ inputs.version }} clean verify
       - uses: actions/upload-artifact@v7
         if: inputs.upload_artifact
         with:

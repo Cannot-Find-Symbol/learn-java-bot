@@ -6,9 +6,10 @@
 
     <groupId>org.learn_java</groupId>
     <artifactId>lj-bot</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${revision}</version>
 
     <properties>
+        <revision>1.0.1-SNAPSHOT</revision>
         <java.version>27</java.version>
         <encoding>UTF-8</encoding>
         <!-- JDA 6.7.0 requires Jackson 2.22.2; Boot 4.1.2 manages 2.21.7. -->
