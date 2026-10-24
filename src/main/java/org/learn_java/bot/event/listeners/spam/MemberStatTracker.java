@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class MemberStatTracker {
-    private static final int MAX_REPEATED_MESSAGE = 5;
+    private static final int MAX_REPEATED_MESSAGE = 4;
     private static final int MAX_REPEATED_DIFFERENT_CHANNELS = 2;
     private static final int UNIQUE_MESSAGES_DUMP_STATS_LIMIT = 5;
     private final long userId;
@@ -32,7 +32,7 @@ public class MemberStatTracker {
             uniqueConcurrentMessageCount = 0;
         }
 
-        messageFrequencyTracker.put(message, messageFrequencyTracker.getOrDefault(message, 1) + 1);
+        messageFrequencyTracker.put(message, messageFrequencyTracker.getOrDefault(message, 0) + 1);
         Set<Long> channelIds = messageToChannelTracker.computeIfAbsent(message, (k) -> new HashSet<>());
         channelIds.add(channelId);
         lastUpdated = LocalDateTime.now();
