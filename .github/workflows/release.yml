@@ -3,12 +3,6 @@ name: Release
 on:
   push:
     branches: [master]
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Release tag
-        required: true
-        default: v1.0.0
 
 permissions:
   contents: write
@@ -27,7 +21,7 @@ jobs:
     needs: test
     runs-on: ubuntu-24.04
     outputs:
-      tag: ${{ inputs.tag || steps.semver.outputs.version_tag }}
+      tag: ${{ steps.semver.outputs.version_tag }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -36,11 +30,11 @@ jobs:
         run: echo "found=$(git tag --list 'v[0-9]*' | grep -q . && echo true || echo false)" >> "$GITHUB_OUTPUT"
       - uses: paulhatch/semantic-version@v5.4.0
         id: semver
-        if: github.event_name == 'push' && steps.tags.outputs.found == 'true'
+        if: steps.tags.outputs.found == 'true'
 
   publish:
     needs: [test, version]
-    if: github.ref == 'refs/heads/master' && needs.version.outputs.tag != ''
+    if: needs.version.outputs.tag != ''
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v8
