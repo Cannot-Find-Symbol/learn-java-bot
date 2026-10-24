@@ -3,6 +3,7 @@ package org.learn_java.bot.integration.service;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.learn_java.bot.configuration.Mapper;
+import org.learn_java.bot.data.dtos.WarnDTO;
 import org.learn_java.bot.data.entities.Warn;
 import org.learn_java.bot.service.WarnService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DataJpaTest(showSql = false, properties = "spring.jpa.hibernate.ddl-auto=create-drop")
+@DataJpaTest(showSql = false, properties = "spring.jpa.hibernate.ddl-auto=validate")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({WarnService.class, Mapper.class})
 class WarnServiceTest extends MariaDbTestContainer {
@@ -37,7 +38,7 @@ class WarnServiceTest extends MariaDbTestContainer {
         var results = service.findByUsername("alice");
 
         assertEquals(Set.of("first", "second"),
-                results.stream().map(warn -> warn.getReason()).collect(Collectors.toSet()));
+                results.stream().map(WarnDTO::getReason).collect(Collectors.toSet()));
         assertTrue(service.findByUsername("missing").isEmpty());
     }
 }
