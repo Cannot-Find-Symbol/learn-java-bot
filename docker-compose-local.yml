@@ -8,7 +8,7 @@ services:
       - bot.env
     depends_on:
       - "database"
-    entrypoint: "wait-for-it database:3306 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar lj-bot-1.0-SNAPSHOT.jar"
+    entrypoint: "wait-for-it database:3306 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar app.jar"
     ports:
       - "5005:5005"
     environment:
