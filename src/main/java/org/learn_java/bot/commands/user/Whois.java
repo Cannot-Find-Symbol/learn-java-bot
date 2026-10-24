@@ -56,8 +56,8 @@ public class Whois extends Command {
     @Override
     public void executeSlash(SlashCommandInteractionEvent event) {
         Member member = Objects.requireNonNull(event.getOption("member")).getAsMember();
-        boolean ephemeral = event.getOption("visible") == null || Objects.requireNonNull(event.getOption("visible")).getAsBoolean();
-        event.deferReply(!ephemeral).queue();
+        boolean onlyVisibleToYou = event.getOption("visible") == null || event.getOption("visible").getAsBoolean();
+        event.deferReply(onlyVisibleToYou).queue();
 
         if (member == null) {
             event.getHook().sendMessage("Cannot find member by that name").queue();
