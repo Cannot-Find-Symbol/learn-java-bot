@@ -2,7 +2,6 @@ package org.learn_java.bot.commands.moderation;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,7 +32,7 @@ public class Ban extends Command {
     public void executeSlash(SlashCommandInteractionEvent event) {
         event.deferReply(true).queue();
         Member member = Objects.requireNonNull(event.getOption("member")).getAsMember();
-        if (!botHasPermissionToBan(Objects.requireNonNull(member))) {
+        if (member == null || !BanPermissions.canBan(member)) {
             event.getHook().sendMessage("I don't have permission to ban that member").queue();
             return;
         }
@@ -49,14 +48,4 @@ public class Ban extends Command {
         return commandData;
     }
 
-    private boolean botHasPermissionToBan(Member member) {
-        Role botHighestRole = getHighestRole(member.getGuild().getSelfMember());
-        Role memberHighestRole = getHighestRole(member);
-
-        return memberHighestRole == null || botHighestRole == null || botHighestRole.compareTo(memberHighestRole) > 0 || !member.getPermissions().contains(Permission.ADMINISTRATOR);
-    }
-
-    private Role getHighestRole(Member member) {
-        return member == null ? null : member.getRoles().stream().sorted().findFirst().orElse(null);
-    }
 }

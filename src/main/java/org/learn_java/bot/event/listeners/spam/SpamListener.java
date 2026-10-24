@@ -1,16 +1,15 @@
 package org.learn_java.bot.event.listeners.spam;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.learn_java.bot.commands.moderation.BanPermissions;
 import org.learn_java.bot.data.repositories.SpamRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -88,7 +87,7 @@ public class SpamListener extends ListenerAdapter {
     }
 
     private void banMember(Member member, String message) {
-        if (!botHasPermissionToBan(member)) {
+        if (!BanPermissions.canBan(member)) {
             logToChannel("I didn't have the power to ban " + member.getEffectiveName() + " for flooding for message: ");
             logToChannel(message);
             return;
@@ -98,13 +97,6 @@ public class SpamListener extends ListenerAdapter {
                 .thenAccept(c -> c.sendMessage(banAppealMessage).submit())
                 .whenComplete((s, error) -> member.ban(1, TimeUnit.DAYS).reason(BAN_REASON).submit())
                 .whenComplete((s, error) -> handleBanResult(member, message, error));
-    }
-
-    private boolean botHasPermissionToBan(Member member) {
-        Role botHighestRole = getHighestRole(member.getGuild().getSelfMember());
-        Role memberHighestRole = getHighestRole(member);
-
-        return memberHighestRole == null || botHighestRole.compareTo(memberHighestRole) > 0 || !member.getPermissions().contains(Permission.ADMINISTRATOR);
     }
 
     private void handleBanResult(Member member, String message, Throwable error) {
@@ -126,6 +118,10 @@ public class SpamListener extends ListenerAdapter {
         if (repository.findByMessage(message) != null) {
             Member member = event.getMember();
             if (member != null) {
+                if (!BanPermissions.canBan(member)) {
+                    event.getChannel().sendMessage("You hit the spam filter, but I cannot ban you").queue();
+                    return;
+                }
                 try {
                     member.ban(REMOVE_HISTORY_DAYS, TimeUnit.DAYS).reason(REASON).flatMap(
                                     rest -> event.getChannel().sendMessage(author + " has hit the spam filter, goodbye"))
@@ -142,7 +138,4 @@ public class SpamListener extends ListenerAdapter {
         trackers.values().removeIf(v -> Duration.between(v.getLastUpdated(), LocalDateTime.now()).toMinutes() >= 30);
     }
 
-    private Role getHighestRole(Member member) {
-        return member.getRoles().stream().sorted().findFirst().orElse(null);
-    }
 }
