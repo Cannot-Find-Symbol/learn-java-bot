@@ -1,5 +1,6 @@
 package org.learn_java.bot.commands.user.run;
 
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import org.junit.jupiter.api.Test;
 import org.learn_java.ekmc.PistonService;
 import org.learn_java.ekmc.model.Language;
@@ -15,6 +16,36 @@ import static org.mockito.Mockito.*;
 class RunTest {
     private final PistonService pistonService = mock(PistonService.class);
     private final Run command = new Run(pistonService);
+
+    @Test
+    void unavailableRuntimeLookupRepliesInsteadOfThrowing() throws IOException {
+        @SuppressWarnings("unchecked")
+        Call<List<Language>> call = mock(Call.class);
+        var event = mock(MessageContextInteractionEvent.class, RETURNS_DEEP_STUBS);
+        when(event.getName()).thenReturn("run");
+        when(pistonService.getRuntimes()).thenReturn(call);
+        when(call.execute()).thenThrow(new IOException("runtime service unavailable"));
+
+        command.executeContextCommand(event);
+
+        verify(event.getHook()).sendMessage("Sorry, the run service is unavailable right now. Please try again later.");
+        verify(pistonService, never()).execute(any());
+    }
+
+    @Test
+    void emptyRuntimeResponseRepliesInsteadOfThrowing() throws IOException {
+        @SuppressWarnings("unchecked")
+        Call<List<Language>> call = mock(Call.class);
+        var event = mock(MessageContextInteractionEvent.class, RETURNS_DEEP_STUBS);
+        when(event.getName()).thenReturn("run");
+        when(pistonService.getRuntimes()).thenReturn(call);
+        when(call.execute()).thenReturn(Response.success(null));
+
+        command.executeContextCommand(event);
+
+        verify(event.getHook()).sendMessage("Sorry, the run service is unavailable right now. Please try again later.");
+        verify(pistonService, never()).execute(any());
+    }
 
     @Test
     void runtimeLookupIsCachedAfterSuccess() throws IOException {
