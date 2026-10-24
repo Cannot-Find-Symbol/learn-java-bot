@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.learn_java.bot.commands.Command;
 import org.learn_java.bot.commands.CommandType;
@@ -24,7 +25,7 @@ public class Ban extends Command {
         this.commandData = Commands.slash(getName(), "bans user")
                 .addOption(OptionType.USER, "member", "member to ban", true)
                 .addOption(OptionType.STRING, "reason", "reason for ban", true)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.BAN_MEMBERS));
     }
 

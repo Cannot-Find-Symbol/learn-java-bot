@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +47,7 @@ public class Leaderboard extends Command {
         SubcommandData allTime = new SubcommandData("alltime", "view leaderboard for current month");
         this.commandData = Commands.slash(getName(), "Show thanks leaderboard")
                 .addSubcommands(month, allTime)
-                .setGuildOnly(true)
+                .setContexts(InteractionContextType.GUILD)
                 .setDefaultPermissions(DefaultMemberPermissions.ENABLED);
     }
 
