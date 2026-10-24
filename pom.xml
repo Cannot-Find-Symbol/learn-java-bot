@@ -9,21 +9,34 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>27</java.version>
         <encoding>UTF-8</encoding>
-        <!-- Match JDA's runtime requirements instead of Spring Boot's older defaults. -->
-        <kotlin.version>2.1.21</kotlin.version>
-        <jackson-bom.version>2.22.2</jackson-bom.version>
+        <!-- JDA 6.7.0 requires Jackson 2.22.2; Boot 4.1.2 manages 2.21.7. -->
+        <jackson-2-bom.version>2.22.2</jackson-2-bom.version>
+        <okhttp.version>5.5.1</okhttp.version>
+        <retrofit.version>3.0.0</retrofit.version>
     </properties>
 
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Boot does not manage OkHttp; align JDA and Retrofit's HTTP dependencies. -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-bom</artifactId>
+                <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -38,11 +51,9 @@
             </exclusions>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.17.0</version>
         </dependency>
 
         <dependency>
@@ -57,19 +68,14 @@
         </dependency>
 
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>5.5.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>retrofit</artifactId>
-            <version>2.11.0</version>
+            <version>${retrofit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>converter-jackson</artifactId>
-            <version>2.11.0</version>
+            <version>${retrofit.version}</version>
         </dependency>
 
         <dependency>
@@ -82,11 +88,10 @@
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
-            <version>2.4.5</version>
+            <version>3.2.8</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -108,16 +113,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
             </plugin>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 </project>
