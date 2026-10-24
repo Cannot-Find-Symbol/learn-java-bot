@@ -6,7 +6,8 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
@@ -45,7 +46,7 @@ public class RoleListener extends ListenerAdapter implements Startup {
         });
 
         builder.setContent(group.getMessage() == null ? "test" : group.getMessage());
-        builder.setActionRow(menuBuilder.build());
+        builder.setComponents(ActionRow.of(menuBuilder.build()));
 
         return builder.build();
     }
