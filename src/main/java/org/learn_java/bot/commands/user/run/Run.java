@@ -74,7 +74,7 @@ public class Run implements ContextCommand {
         }
     }
 
-    private Map<String, Language> buildLanguageMap(@NotNull List<Language> languages) {
+    Map<String, Language> buildLanguageMap(@NotNull List<Language> languages) {
         Map<String, Language> map = new HashMap<>();
         languages.forEach(language -> {
             map.put(language.getLanguage(), language);
@@ -112,19 +112,19 @@ public class Run implements ContextCommand {
         });
     }
 
-    private String addCommonImports(String code, Language language) {
+    String addCommonImports(String code, Language language) {
         if (language.getLanguage().equalsIgnoreCase("java")) {
             return COMMON_IMPORTS + addClass(code);
         }
         return code;
     }
 
-    private String addClass(String code) {
+    String addClass(String code) {
         if (code.contains("class")) return code;
         return "class Example {" + addMainMethod(code) + "};";
     }
 
-    private String addMainMethod(String code) {
+    String addMainMethod(String code) {
         if (code.contains("public static void main")) return code;
         return """
                 public static void main(String[] args) {
