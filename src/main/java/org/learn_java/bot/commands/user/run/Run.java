@@ -31,12 +31,12 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 public class Run implements ContextCommand {
     private static final int FIELD_WIDTH = 1024;
     private static final String LANGUAGE_IS_INVALID = "Sorry, can't run this code. No language provided or language is invalid";
+    private static final String RUNTIME_UNAVAILABLE = "Sorry, the run service is unavailable right now. Please try again later.";
     private static final Logger logger = LoggerFactory.getLogger(Run.class);
     private static final String COMMON_IMPORTS =
             """
@@ -66,10 +66,14 @@ public class Run implements ContextCommand {
         if (languageMap == null || Duration.between(lastLanguageRefresh, LocalDateTime.now()).toHours() > 24) {
             try {
                 Response<List<Language>> response = pistonService.getRuntimes().execute();
-                languageMap = buildLanguageMap(Objects.requireNonNull(response.body()));
+                if (!response.isSuccessful() || response.body() == null) {
+                    logger.warn("Could not load run service languages: HTTP {}", response.code());
+                    return;
+                }
+                languageMap = buildLanguageMap(response.body());
                 this.lastLanguageRefresh = LocalDateTime.now();
             } catch (IOException io) {
-                logger.error(String.valueOf(io));
+                logger.error("Could not load run service languages", io);
             }
         }
     }
@@ -84,6 +88,10 @@ public class Run implements ContextCommand {
     }
 
     private void sendResponseToChannel(Message message, InteractionHook hook) {
+        if (languageMap == null) {
+            hook.sendMessage(RUNTIME_UNAVAILABLE).queue();
+            return;
+        }
         String lang = StringUtils.substringBetween(message.getContentRaw(), "```", "\n");
         String code = StringUtils.substringBetween(message.getContentRaw(), "```" + lang + "\n", "```");
 
