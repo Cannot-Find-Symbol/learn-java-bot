@@ -1,12 +1,12 @@
 version: "3.3"
 services:
   bot:
-    image: ghcr.io/cannot-find-symbol/learn-java-bot:master
+    image: ghcr.io/cannot-find-symbol/learn-java-bot:latest
     env_file:
         - bot.env
     depends_on:
       - "database"
-    entrypoint: "wait-for-it database:3306 -- java -jar lj-bot-1.0-SNAPSHOT.jar"
+    entrypoint: "wait-for-it database:3306 -- java -jar app.jar"
     environment:
       - spring.datasource.url=jdbc:mariadb://database:3306/LEARNJAVA
       - spring.datasource.username=root
